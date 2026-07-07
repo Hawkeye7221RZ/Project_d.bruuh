@@ -748,3 +748,93 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   .content-section { padding: 48px 20px; }
   .section-heading h2 { font-size: 32px; }
 }
+
+/* ==========================================================
+   TENTANG
+   ========================================================== */
+.about-section {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px 24px 48px;
+}
+
+.about-lead {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1.5;
+  color: var(--charcoal);
+  text-align: center;
+  margin: 0 0 8px;
+}
+
+.about-body {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-muted);
+  margin: 0 auto 24px;
+  max-width: 600px;
+}
+
+.reason-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 960px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+.reason-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 22px;
+  text-align: center;
+}
+
+.reason-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--bg-soft);
+  color: var(--forest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.reason-card h3 {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin: 0 0 8px;
+}
+
+.reason-card p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.about-signature {
+  text-align: center;
+  padding: 32px 24px 0;
+}
+.about-signature p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0 0 4px;
+}
+.about-signature .name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--forest);
+}
+
+@media (max-width: 768px) {
+  .reason-grid { grid-template-columns: 1fr; }
+  .about-lead { font-size: 21px; }
+}
