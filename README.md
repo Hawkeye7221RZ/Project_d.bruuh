@@ -113,6 +113,6 @@ Lalu buka Pull Request ke `main` di GitHub.
 
 ## 💌 Dibuat oleh
 
-**Iyan** & **Arap** — sambil libur, sambil belajar, sambil kangen-kangenan.
+**Iyan** & **Arap** — sambil libur, sambil belajar
 
 <p align="center">✦ ✦ ✦</p>
