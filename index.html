@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>d.bruuh_</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============ NAVBAR ============ -->
+  <header class="navbar">
+    <a href="index.html" class="logo-link" aria-label="Kembali ke Beranda">
+      <img src="assets/logo.png" alt="Logo" class="logo-img" />
+    </a>
+
+    <nav class="nav-links">
+      <a href="index.html" class="active">Beranda</a>
+
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-btn">
+          Konten
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="index.html#gallery">Galeri</a>
+          <a href="index.html#timeline">Timeline</a>
+          <a href="index.html#video">Video</a>
+        </div>
+      </div>
+
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-btn">
+          Komunitas
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="profil-teman.html">Profil Teman</a>
+          <a href="pesan-kesan.html">Pesan &amp; Kesan</a>
+        </div>
+      </div>
+
+      <a href="tentang.html">Tentang</a>
+    </nav>
+
+    <div class="navbar-actions">
+      <button class="icon-btn" aria-label="Cari">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="btn-upload">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Unggah
+      </button>
+      <div class="avatar"></div>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-image">
+      <svg></svg>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-text">
+      <h1>Setiap Cerita,<br />Tersimpan di Sini</h1>
+    </div>
+  </section>
+
+  <!-- ============ QUICK FILTER + GALLERY PREVIEW ============ -->
+  <section class="quick-gallery">
+    <div class="filter-tabs" id="filterTabs">
+      <button class="tab active" data-filter="Semua">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Semua
+      </button>
+      <button class="tab" data-filter="Foto">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        Foto
+      </button>
+      <button class="tab" data-filter="Video">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Video
+      </button>
+      <button class="tab" data-filter="Perjalanan">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Perjalanan
+      </button>
+      <button class="tab" data-filter="Camping">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20L10 4 1 20z"/><path d="M13.5 13L10 4l-3.5 9"/></svg>
+        Camping
+      </button>
+      <button class="tab" data-filter="Cerita">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.38 8.38 0 0 1 4 11.5 8.38 8.38 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg>
+        Cerita
+      </button>
+    </div>
+
+    <div class="photo-grid" id="quickGrid">
+      <div class="photo-card" data-category="Foto">
+      <img src="assets/full member.jpg" alt="Angkatan lengkap" style="width:100%; height:100%; object-fit:cover;">        
+      <div class="photo-caption">Member d.bruuh</div>
+      </div>
+      <div class="photo-card" data-category="Perjalanan">
+        <img src="assets/perjalanan riam.jpg" alt="Riam Merasap" style="width:100%; height:100%; object-fit:cover;">
+        <div class="photo-caption">Indomaret Pinyu</div>
+      </div>
+      <div class="photo-card" data-category="Camping">
+        <img src="assets/camping.jpg" alt="Camping Singkawang" style="width:100%; height:100%; object-fit:cover;">
+        <div class="photo-caption">Camping Singkawang</div>
+      </div>
+      <div class="photo-card" data-category="Foto">
+        <img src="assets/riam.jpg" alt="Konvoi pulang sekolah" style="width:100%; height:100%; object-fit:cover;">
+        <div class="photo-caption">Riam Merasap</div>
+      </div>
+      <div class="photo-card" data-category="Foto">
+      <img src="assets/sesi pantaai.jpg" alt="Angkatan lengkap" style="width:100%; height:100%; object-fit:cover;">        
+      <div class="photo-caption">Sesi Pantai Singkawang</div>
+      </div>
+    </div>
+
+    <p class="empty-state" id="emptyState" hidden>Belum ada konten untuk kategori ini.</p>
+  </section>
+
+  <!-- ============ TIMELINE ============ -->
+  <section class="content-section" id="timeline">
+    <div class="section-heading">
+      <p class="eyebrow center">Sejak Awal</p>
+      <h2>Perjalanan Kita</h2>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="timeline-dot"></span>
+        <div class="timeline-date">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Jul 2023
+        </div>
+        <h3>MOS &amp; Hari Pertama</h3>
+        <p>Awal semuanya dimulai — masih canggung, masih asing.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-dot"></span>
+        <div class="timeline-date">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Nov 2023
+        </div>
+        <h3>Study Tour Yogyakarta</h3>
+        <p>3 hari 2 malam yang penuh tawa di dalam bus.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-dot"></span>
+        <div class="timeline-date">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Mar 2024
+        </div>
+        <h3>Ujian Tengah Semester</h3>
+        <p>Begadang bareng, contekan dadakan, dan drama H-1.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-dot"></span>
+        <div class="timeline-date">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Aug 2024
+        </div>
+        <h3>Camping Angkatan</h3>
+        <p>Api unggun, gitar, dan cerita sampai subuh.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-dot"></span>
+        <div class="timeline-date">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Apr 2025
+        </div>
+        <h3>Ujian Akhir</h3>
+        <p>Titik paling menegangkan — tapi juga paling solid.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-dot"></span>
+        <div class="timeline-date">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Jun 2025
+        </div>
+        <h3>Kelulusan</h3>
+        <p>Toga, tangis, dan janji untuk selalu balik lagi ke sini.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><span></span><em>✦ ✦ ✦</em><span></span></div>
+
+  <!-- ============ GALLERY (FULL) ============ -->
+  <section class="content-section" id="gallery">
+    <div class="section-heading">
+      <p class="eyebrow center">Momen Terekam</p>
+      <h2>Galeri Kenangan</h2>
+    </div>
+
+    <div class="gallery-grid">
+      <div class="gallery-card">
+        <div class="photo-placeholder"></div>
+        <div class="gallery-overlay"><span class="tag">Kelas</span><span class="caption">Angkatan lengkap</span></div>
+      </div>
+      <div class="gallery-card">
+        <div class="photo-placeholder"></div>
+        <div class="gallery-overlay"><span class="tag">Perjalanan</span><span class="caption">Air terjun, entah di mana</span></div>
+      </div>
+      <div class="gallery-card">
+        <div class="photo-placeholder"></div>
+        <div class="gallery-overlay"><span class="tag">Camping</span><span class="caption">Malam terakhir camping</span></div>
+      </div>
+      <div class="gallery-card">
+        <div class="photo-placeholder"></div>
+        <div class="gallery-overlay"><span class="tag">Kelas</span><span class="caption">Konvoi pulang sekolah</span></div>
+      </div>
+      <div class="gallery-card">
+        <div class="photo-placeholder"></div>
+        <div class="gallery-overlay"><span class="tag">Perjalanan</span><span class="caption">Study tour, hari kedua</span></div>
+      </div>
+      <div class="gallery-card">
+        <div class="photo-placeholder"></div>
+        <div class="gallery-overlay"><span class="tag">Kelas</span><span class="caption">Sesi foto dadakan</span></div>
+      </div>
+    </div>
+
+    <div class="section-cta">
+      <button class="link-btn">
+        Lihat semua foto
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <div class="divider"><span></span><em>✦ ✦ ✦</em><span></span></div>
+
+  <!-- ============ VIDEO ============ -->
+  <section class="content-section" id="video">
+    <div class="section-heading">
+      <p class="eyebrow center">Bergerak &amp; Bersuara</p>
+      <h2>Video Momen</h2>
+    </div>
+
+    <div class="video-grid" id="videoGrid">
+      <button class="video-card" data-title="Recap 3 Tahun" data-duration="2:14">
+        <span class="play-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </span>
+        <div class="video-info">
+          <p class="video-title">Recap 3 Tahun</p>
+          <span class="video-duration">2:14</span>
+        </div>
+      </button>
+      <button class="video-card" data-title="Camping Angkatan 2024" data-duration="4:02">
+        <span class="play-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </span>
+        <div class="video-info">
+          <p class="video-title">Camping Angkatan 2024</p>
+          <span class="video-duration">4:02</span>
+        </div>
+      </button>
+      <button class="video-card" data-title="Detik-detik Kelulusan" data-duration="1:47">
+        <span class="play-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </span>
+        <div class="video-info">
+          <p class="video-title">Detik-detik Kelulusan</p>
+          <span class="video-duration">1:47</span>
+        </div>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ VIDEO MODAL ============ -->
+  <div class="video-modal" id="videoModal">
+    <div class="video-modal-content">
+      <button class="modal-close" id="modalClose">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="video-modal-placeholder">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <p id="modalVideoTitle">Video akan tampil di sini setelah diunggah</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Dibuat dengan kenangan oleh angkatan 2025</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

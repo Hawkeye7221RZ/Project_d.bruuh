@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kenang. — Pesan & Kesan</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============ NAVBAR ============ -->
+  <header class="navbar">
+    <a href="index.html" class="logo-link" aria-label="Kembali ke Beranda">
+      <img src="assets/logo.png" alt="Logo" class="logo-img" />
+    </a>
+
+    <nav class="nav-links">
+      <a href="index.html">Beranda</a>
+
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-btn">
+          Konten
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="index.html#gallery">Galeri</a>
+          <a href="index.html#timeline">Timeline</a>
+          <a href="index.html#video">Video</a>
+        </div>
+      </div>
+
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-btn active">
+          Komunitas
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="profil-teman.html">Profil Teman</a>
+          <a href="pesan-kesan.html">Pesan &amp; Kesan</a>
+        </div>
+      </div>
+
+      <a href="tentang.html">Tentang</a>
+    </nav>
+
+    <div class="navbar-actions">
+      <button class="icon-btn" aria-label="Cari">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="btn-upload">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Unggah
+      </button>
+      <div class="avatar"></div>
+    </div>
+  </header>
+
+  <!-- ============ PAGE HEADER ============ -->
+  <div class="page-header">
+    <h1>Pesan &amp; Kesan</h1>
+    <p>Kata-kata terakhir sebelum kita semua sibuk dengan jalan masing-masing.</p>
+  </div>
+
+  <div class="page-cta">
+    <button class="btn-primary" id="btnTulisPesan">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Tulis Pesan
+    </button>
+  </div>
+
+  <!-- ============ MESSAGE LIST ============ -->
+  <div class="message-list">
+    <div class="message-card">
+      <div class="message-avatar"></div>
+      <div class="message-body">
+        <div class="message-head">
+          <span class="message-name">Alya Ramadhani</span>
+          <span class="message-time">2 hari lalu</span>
+        </div>
+        <p class="message-text">Makasih buat 3 tahun ini, gak nyangka secepat ini. Sukses selalu buat kita semua!</p>
+      </div>
+    </div>
+
+    <div class="message-card">
+      <div class="message-avatar"></div>
+      <div class="message-body">
+        <div class="message-head">
+          <span class="message-name">Bima Satria</span>
+          <span class="message-time">3 hari lalu</span>
+        </div>
+        <p class="message-text">Camping angkatan itu momen paling gak akan pernah aku lupain. See you on top, guys.</p>
+      </div>
+    </div>
+
+    <div class="message-card">
+      <div class="message-avatar"></div>
+      <div class="message-body">
+        <div class="message-head">
+          <span class="message-name">Citra Ayu</span>
+          <span class="message-time">5 hari lalu</span>
+        </div>
+        <p class="message-text">Kelas paling berisik tapi paling solid. Jangan hilang kontak ya semuanya!</p>
+      </div>
+    </div>
+
+    <div class="message-card">
+      <div class="message-avatar"></div>
+      <div class="message-body">
+        <div class="message-head">
+          <span class="message-name">Dimas Prakoso</span>
+          <span class="message-time">1 minggu lalu</span>
+        </div>
+        <p class="message-text">Terima kasih udah jadi teman sekelas yang seru. Semoga kita ketemu lagi di reuni!</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Dibuat dengan kenangan oleh angkatan 2025</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
