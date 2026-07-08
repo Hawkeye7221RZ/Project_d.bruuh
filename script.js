@@ -1,4 +1,71 @@
 /* ==========================================================
+   MOBILE MENU — hamburger toggle, dropdown via tap
+   ========================================================== */
+const menuToggle = document.getElementById('menuToggle');
+const navLinks = document.getElementById('navLinks');
+const navBackdrop = document.getElementById('navBackdrop');
+
+function closeMobileMenu() {
+  if (navLinks) navLinks.classList.remove('open');
+  if (navBackdrop) navBackdrop.classList.remove('open');
+  if (menuToggle) menuToggle.classList.remove('open');
+  document.querySelectorAll('.nav-dropdown').forEach((d) => {
+    d.classList.remove('mobile-open');
+    const m = d.querySelector('.nav-dropdown-menu');
+    if (m) m.style.display = 'none';
+  });
+}
+
+if (menuToggle && navLinks) {
+  menuToggle.addEventListener('click', () => {
+    const isOpen = navLinks.classList.toggle('open');
+    menuToggle.classList.toggle('open', isOpen);
+    if (navBackdrop) navBackdrop.classList.toggle('open', isOpen);
+  });
+
+  if (navBackdrop) {
+    navBackdrop.addEventListener('click', closeMobileMenu);
+  }
+
+  // dropdown "Konten" & "Komunitas" dibuka pakai tap, bukan hover, khusus mobile
+  document.querySelectorAll('.nav-dropdown-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) {
+        e.preventDefault();
+        const parent = btn.closest('.nav-dropdown');
+        const submenu = parent.querySelector('.nav-dropdown-menu');
+        const alreadyOpen = parent.classList.contains('mobile-open');
+
+        // tutup semua dropdown lain dulu (class + inline style)
+        document.querySelectorAll('.nav-dropdown').forEach((d) => {
+          d.classList.remove('mobile-open');
+          const m = d.querySelector('.nav-dropdown-menu');
+          if (m) m.style.display = 'none';
+        });
+
+        // kalau yang diklik sebelumnya belum kebuka, buka sekarang
+        if (!alreadyOpen) {
+          parent.classList.add('mobile-open');
+          if (submenu) submenu.style.display = 'block';
+        }
+      }
+    });
+  });
+
+  // klik link biasa (bukan tombol dropdown) langsung nutup menu mobile
+  navLinks.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeMobileMenu();
+    });
+  });
+
+  // tutup menu kalau layar di-resize balik ke ukuran desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) closeMobileMenu();
+  });
+}
+
+/* ==========================================================
    FILTER KATEGORI — QUICK GALLERY
    ========================================================== */
 const filterTabs = document.getElementById('filterTabs');
