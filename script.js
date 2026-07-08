@@ -1,4 +1,36 @@
 /* ==========================================================
+   HERO SLIDER — cuma lewat tombol panah, tanpa swipe
+   ========================================================== */
+const heroTrack = document.getElementById('heroTrack');
+
+if (heroTrack) {
+  const slides = heroTrack.querySelectorAll('.hero-slide');
+  const dotsWrap = document.getElementById('heroDots');
+  const prevBtn = document.getElementById('heroPrev');
+  const nextBtn = document.getElementById('heroNext');
+  let index = 0;
+
+  // bikin dots otomatis sesuai jumlah foto
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Ke foto ${i + 1}`);
+    dot.addEventListener('click', () => goToSlide(i));
+    dotsWrap.appendChild(dot);
+  });
+  const dots = dotsWrap.querySelectorAll('.hero-dot');
+
+  function goToSlide(newIndex) {
+    index = (newIndex + slides.length) % slides.length; // muter balik ke awal/akhir
+    heroTrack.style.transform = `translateX(-${index * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === index));
+  }
+
+  prevBtn.addEventListener('click', () => goToSlide(index - 1));
+  nextBtn.addEventListener('click', () => goToSlide(index + 1));
+}
+
+/* ==========================================================
    FILTER KATEGORI — QUICK GALLERY
    ========================================================== */
 const filterTabs = document.getElementById('filterTabs');
