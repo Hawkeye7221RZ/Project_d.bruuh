@@ -1,4 +1,96 @@
 /* ==========================================================
+   NAVBAR HEIGHT SYNC — supaya konten gak ketutup navbar fixed di HP
+   ========================================================== */
+const navbarEl = document.querySelector('.navbar');
+
+function syncNavbarHeight() {
+  if (!navbarEl) return;
+  if (window.innerWidth <= 768) {
+    const h = navbarEl.offsetHeight;
+    document.documentElement.style.setProperty('--navbar-h', h + 'px');
+  } else {
+    document.documentElement.style.removeProperty('--navbar-h');
+  }
+}
+
+syncNavbarHeight();
+window.addEventListener('resize', syncNavbarHeight);
+window.addEventListener('load', syncNavbarHeight);
+
+/* ==========================================================
+   MOBILE NAV — hamburger, backdrop, dropdown accordion
+   ========================================================== */
+const menuToggle = document.getElementById('menuToggle');
+const navLinks = document.getElementById('navLinks');
+const navBackdrop = document.getElementById('navBackdrop');
+
+function openMobileMenu() {
+  navLinks.classList.add('open');
+  navBackdrop.classList.add('open');
+  menuToggle.classList.add('open');
+  menuToggle.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden'; // biar konten belakang gak ikut kescroll
+}
+
+function closeMobileMenu() {
+  navLinks.classList.remove('open');
+  navBackdrop.classList.remove('open');
+  menuToggle.classList.remove('open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
+
+  // tutup juga semua accordion dropdown yang lagi kebuka
+  document.querySelectorAll('.nav-dropdown.mobile-open').forEach((el) => {
+    el.classList.remove('mobile-open');
+  });
+}
+
+if (menuToggle && navLinks && navBackdrop) {
+  menuToggle.addEventListener('click', () => {
+    const isOpen = navLinks.classList.contains('open');
+    isOpen ? closeMobileMenu() : openMobileMenu();
+  });
+
+  navBackdrop.addEventListener('click', closeMobileMenu);
+
+  // tutup menu dengan tombol Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMobileMenu();
+  });
+
+  // dropdown "Konten" / "Komunitas" jadi accordion pas mobile
+  document.querySelectorAll('.nav-dropdown-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      // di layar besar dropdown udah jalan otomatis lewat hover, jadi skip
+      if (window.innerWidth > 768) return;
+
+      e.preventDefault();
+      const parent = btn.closest('.nav-dropdown');
+      const isOpen = parent.classList.contains('mobile-open');
+
+      // tutup dropdown lain biar cuma satu yang kebuka
+      document.querySelectorAll('.nav-dropdown.mobile-open').forEach((el) => {
+        if (el !== parent) el.classList.remove('mobile-open');
+      });
+
+      parent.classList.toggle('mobile-open', !isOpen);
+    });
+  });
+
+  // klik link biasa di dalam menu mobile langsung nutup menu
+  navLinks.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeMobileMenu();
+    });
+  });
+
+  // kalau layar di-resize balik ke ukuran desktop, reset state mobile menu
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) closeMobileMenu();
+  });
+}
+
+/* ==========================================================
    HERO SLIDER — cuma lewat tombol panah, tanpa swipe
    ========================================================== */
 const heroTrack = document.getElementById('heroTrack');

@@ -22,13 +22,19 @@
 
 * { box-sizing: border-box; }
 
-html, body {
+html {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
   margin: 0;
   padding: 0;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
-  scroll-behavior: smooth;
+  overflow-x: clip; /* cegah scroll horizontal tanpa merusak position:sticky */
 }
 
 a { text-decoration: none; color: inherit; }
@@ -807,7 +813,15 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
    RESPONSIVE
    ========================================================== */
 @media (max-width: 768px) {
-  .navbar { padding: 12px 20px; }
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 12px 20px;
+  }
+  body { padding-top: var(--navbar-h, 64px); } /* biar konten gak ketutup navbar yang fixed */
   .menu-toggle { display: flex; }
 
   .nav-links {
@@ -990,4 +1004,61 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
 @media (max-width: 768px) {
   .reason-grid { grid-template-columns: 1fr; }
   .about-lead { font-size: 21px; }
+}
+
+/* ==========================================================
+   HP KECIL (≤480px) — tuning ekstra biar enak dipegang
+   ========================================================== */
+@media (max-width: 480px) {
+  .navbar { padding: 10px 16px; }
+  .logo-link { height: 24px; }
+  .btn-login span,
+  .btn-login { font-size: 0; padding: 8px; gap: 0; } /* sisain ikonnya aja biar gak sempit */
+  .btn-login svg { font-size: initial; }
+
+  /* Hero jadi lebih tinggi (bukan panorama 21:9) supaya wajah orang gak kegepeng */
+  .hero { margin: 16px 16px 0; aspect-ratio: 4 / 5; border-radius: 12px; }
+  .hero-track { aspect-ratio: 4 / 5; }
+  .hero-text { padding: 20px 18px; }
+  .hero-text h1 { font-size: 24px; line-height: 1.25; }
+  .hero-nav { width: 30px; height: 30px; }
+  .hero-nav.prev { left: 10px; }
+  .hero-nav.next { right: 10px; }
+  .hero-dots { bottom: 14px; }
+
+  .quick-gallery { padding: 24px 16px; }
+  .filter-tabs { gap: 6px; margin-bottom: 24px; }
+  .tab { padding: 8px 12px; font-size: 13px; }
+  .photo-grid, .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+  .content-section { padding: 32px 16px; }
+  .section-heading h2 { font-size: 26px; }
+  .section-heading { margin-bottom: 28px; }
+
+  .timeline { padding-left: 24px; }
+  .timeline-dot { left: -24px; }
+  .timeline-item h3 { font-size: 20px; }
+
+  .page-header { padding: 40px 16px 12px; }
+  .page-header h1 { font-size: 28px; }
+  .page-header p { font-size: 14px; }
+
+  .profile-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px 40px; margin-top: 24px; }
+  .profile-card { padding: 18px 12px; }
+  .profile-avatar { width: 60px; height: 60px; }
+  .profile-name { font-size: 18px; }
+  .profile-quote { font-size: 12px; }
+
+  .message-list { padding: 0 16px 48px; margin-top: 24px; gap: 12px; }
+  .message-card { padding: 14px 16px; gap: 10px; }
+  .message-head { flex-wrap: wrap; gap: 4px 8px; }
+  .message-name { font-size: 16px; }
+
+  .about-section { padding: 8px 16px 32px; }
+  .about-lead { font-size: 19px; }
+  .about-body { font-size: 14px; }
+  .reason-grid { padding: 0 16px; margin: 24px auto; }
+  .reason-card { padding: 22px 18px; }
+
+  .video-modal { padding: 12px; }
 }
