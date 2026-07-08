@@ -134,23 +134,7 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   justify-self: end;
 }
 
-/* Tombol Masuk/Keluar */
-.btn-login {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
-  color: rgba(244, 241, 234, 0.9);
-  font-size: 13px;
-  white-space: nowrap;
-  transition: background .2s ease;
-}
-.btn-login:hover {
-  background: rgba(244, 241, 234, 0.12);
-}
-.btn-login svg { flex-shrink: 0; }
+.nav-links-logo { display: none; } /* cuma muncul di panel menu HP */
 
 .nav-dropdown-btn:focus,
 .nav-dropdown-btn:focus-visible {
@@ -915,8 +899,8 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
     right: 0;
     width: 100%;
     padding: 12px 20px;
-    display: flex;              
-  justify-content: space-between;
+    display: flex;              /* tambahkan ini */
+  justify-content: space-between;  /* tambahkan ini */
   }
   body { padding-top: var(--navbar-h, 64px); } /* biar konten gak ketutup navbar yang fixed */
   .menu-toggle { display: flex; }
@@ -941,6 +925,17 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
     z-index: 46;
   }
   .nav-links.open { transform: translateX(0); }
+
+  .nav-links-logo {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 60px;
+  }
+  .nav-links-logo img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+  }
 
   .nav-links a {
     color: var(--charcoal);
@@ -1095,14 +1090,9 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
 @media (max-width: 480px) {
   .navbar { padding: 10px 16px; }
   .logo-link { height: 24px; }
-  .btn-login {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    gap: 0;
-    justify-content: center;
-  }
-  .btn-login span { display: none; } /* sisain ikonnya aja biar gak sempit */
+  .btn-login span,
+  .btn-login { font-size: 0; padding: 8px; gap: 0; } /* sisain ikonnya aja biar gak sempit */
+  .btn-login svg { font-size: initial; }
 
   /* Hero jadi lebih tinggi (bukan panorama 21:9) supaya wajah orang gak kegepeng */
   .hero { margin: 16px 16px 0; aspect-ratio: 4 / 5; border-radius: 12px; }
