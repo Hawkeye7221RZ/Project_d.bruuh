@@ -91,7 +91,7 @@ if (menuToggle && navLinks && navBackdrop) {
 }
 
 /* ==========================================================
-   HERO SLIDER — cuma lewat tombol panah, tanpa swipe
+   HERO SLIDER — tombol panah (laptop) + swipe/geser (HP)
    ========================================================== */
 const heroTrack = document.getElementById('heroTrack');
 
@@ -120,6 +120,42 @@ if (heroTrack) {
 
   prevBtn.addEventListener('click', () => goToSlide(index - 1));
   nextBtn.addEventListener('click', () => goToSlide(index + 1));
+
+  // ---- SWIPE / GESER JARI (touch, buat HP) ----
+  let touchStartX = 0;
+  let touchCurrentX = 0;
+  let isSwiping = false;
+
+  heroTrack.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchCurrentX = touchStartX;
+    isSwiping = true;
+    heroTrack.style.transition = 'none'; // biar keikut jari tanpa delay
+  }, { passive: true });
+
+  heroTrack.addEventListener('touchmove', (e) => {
+    if (!isSwiping) return;
+    touchCurrentX = e.touches[0].clientX;
+    const diff = touchCurrentX - touchStartX;
+    heroTrack.style.transform = `translateX(calc(-${index * 100}% + ${diff}px))`;
+  }, { passive: true });
+
+  heroTrack.addEventListener('touchend', () => {
+    if (!isSwiping) return;
+    isSwiping = false;
+    heroTrack.style.transition = ''; // balikin animasi transisi normal
+
+    const diff = touchCurrentX - touchStartX;
+    const threshold = 50; // minimal geser 50px baru dianggap ganti slide
+
+    if (diff > threshold) {
+      goToSlide(index - 1); // geser ke kanan -> foto sebelumnya
+    } else if (diff < -threshold) {
+      goToSlide(index + 1); // geser ke kiri -> foto berikutnya
+    } else {
+      goToSlide(index); // geseran kurang jauh -> balik ke posisi semula
+    }
+  });
 }
 
 /* ==========================================================
@@ -382,25 +418,50 @@ const videoModal = document.getElementById('videoModal');
 const modalClose = document.getElementById('modalClose');
 const modalVideoTitle = document.getElementById('modalVideoTitle');
 
-function openVideoModal(title) {
-  if (modalVideoTitle) {
-    modalVideoTitle.textContent = `Video akan tampil di sini setelah diunggah: ${title}`;
+const videoModalContent = document.querySelector('.video-modal-content');
+
+function openVideoModal(title, src) {
+  if (!videoModalContent) return;
+
+  if (src) {
+    // ada file video -> tampilkan player asli
+    videoModalContent.innerHTML = `
+      <button class="modal-close" id="modalClose">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <video src="${src}" controls autoplay style="width:100%;border-radius:8px;"></video>
+    `;
+  } else {
+    // belum ada file video -> placeholder seperti biasa
+    videoModalContent.innerHTML = `
+      <button class="modal-close" id="modalClose">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="video-modal-placeholder">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <p>Video akan tampil di sini setelah diunggah: ${title}</p>
+      </div>
+    `;
   }
+
+  // pasang ulang listener tombol close karena elemen baru dibuat
+  videoModalContent.querySelector('#modalClose').addEventListener('click', closeVideoModal);
+
   videoModal.classList.add('open');
 }
 
 function closeVideoModal() {
   videoModal.classList.remove('open');
+  const video = videoModalContent?.querySelector('video');
+  if (video) video.pause(); // stop video pas modal ditutup
 }
 
 if (videoGrid && videoModal) {
   videoGrid.addEventListener('click', (e) => {
     const card = e.target.closest('.video-card');
     if (!card) return;
-    openVideoModal(card.dataset.title);
+    openVideoModal(card.dataset.title, card.dataset.src);
   });
-
-  modalClose.addEventListener('click', closeVideoModal);
 
   // tutup modal kalau klik area gelap di luar konten
   videoModal.addEventListener('click', (e) => {
