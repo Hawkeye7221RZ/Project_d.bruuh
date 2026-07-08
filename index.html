@@ -62,16 +62,32 @@
     <div class="nav-backdrop" id="navBackdrop"></div>
   </header>
 
-  <!-- ============ HERO ============ -->
-  <section class="hero">
-    <div class="hero-image">
-      <svg></svg>
-    </div>
-    <div class="hero-overlay"></div>
-    <div class="hero-text">
-      <h1>Setiap Cerita,<br />Tersimpan di Sini</h1>
-    </div>
-  </section>
+<!-- ============ HERO SLIDER ============ -->
+<section class="hero">
+  <div class="hero-track" id="heroTrack">
+    <div class="hero-slide"><img src="assets/Kumpul.jpg" alt="Kumpul bareng" /></div>
+    <div class="hero-slide"><img src="assets/full member.jpg" alt="Member lengkap" /></div>
+    <div class="hero-slide"><img src="assets/camping.jpg" alt="Camping Singkawang" /></div>
+    <div class="hero-slide"><img src="assets/riam.jpg" alt="Riam Merasap" /></div>
+    <div class="hero-slide"><img src="assets/sesi pantaai.jpg" alt="Sesi pantai" /></div>
+    <div class="hero-slide"><img src="assets/camping2.jpg" alt="Camping" /></div>
+    <div class="hero-slide"><img src="assets/kumpul baju putih.jpg" alt="Kumpul baju putih" /></div>
+  </div>
+
+  <div class="hero-overlay"></div>
+  <div class="hero-text">
+    <h1>Setiap Cerita,<br />Tersimpan di Sini</h1>
+  </div>
+
+  <button class="hero-nav prev" id="heroPrev" aria-label="Foto sebelumnya">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="hero-nav next" id="heroNext" aria-label="Foto berikutnya">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+
+  <div class="hero-dots" id="heroDots"></div>
+</section>
 
   <!-- ============ QUICK FILTER + GALLERY PREVIEW ============ -->
   <section class="quick-gallery">
