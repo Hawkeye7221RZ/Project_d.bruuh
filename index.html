@@ -51,9 +51,9 @@
     </nav>
 
     <div class="navbar-actions">
-      <button class="btn-login">
+      <button class="btn-login" id="btnMasuk">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        Masuk
+        <span id="btnMasukText">Masuk</span>
       </button>
       <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">
         <svg class="icon-burger" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -326,10 +326,54 @@
     </div>
   </div>
 
+  <!-- ============ MODAL: MASUK / DAFTAR ============ -->
+  <div class="modal" id="modalAuth" style="display:none;">
+    <div class="modal-content">
+      <span class="close-btn" id="btnTutupAuth">&times;</span>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-tab="login">Masuk</button>
+        <button type="button" class="auth-tab" data-tab="daftar">Daftar</button>
+      </div>
+
+      <form id="form-login" class="auth-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required />
+        </div>
+        <button type="submit" id="btnKirim">Masuk</button>
+        <p class="auth-msg" id="loginMsg"></p>
+      </form>
+
+      <form id="form-daftar" class="auth-form" style="display:none;">
+        <div class="form-group">
+          <label for="daftar-nama">Nama</label>
+          <input type="text" id="daftar-nama" required />
+        </div>
+        <div class="form-group">
+          <label for="daftar-email">Email</label>
+          <input type="email" id="daftar-email" required />
+        </div>
+        <div class="form-group">
+          <label for="daftar-password">Password (min. 6 karakter)</label>
+          <input type="password" id="daftar-password" minlength="6" required />
+        </div>
+        <button type="submit" id="btnKirim">Daftar</button>
+        <p class="auth-msg" id="daftarMsg"></p>
+      </form>
+    </div>
+  </div>
+
+
   <footer class="footer">
     <p>Dibuat oleh iyn & r4ps</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
 </body>
 </html>
