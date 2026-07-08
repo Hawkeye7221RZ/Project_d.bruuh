@@ -897,6 +897,8 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
     right: 0;
     width: 100%;
     padding: 12px 20px;
+    display: flex;              
+  justify-content: space-between;
   }
   body { padding-top: var(--navbar-h, 64px); } /* biar konten gak ketutup navbar yang fixed */
   .menu-toggle { display: flex; }
