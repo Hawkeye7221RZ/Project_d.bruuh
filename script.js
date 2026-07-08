@@ -398,17 +398,118 @@ if (formPesan) {
 
         if (error) {
             alert('Gagal mengirim: ' + error.message);
-        } else {
-            alert('Pesan berhasil terkirim!');
-            formPesan.reset(); // Kosongkan form
-            if (modal) modal.style.display = 'none'; // Tutup pop-up otomatis
-            muatPesan(); // Refresh daftar pesan agar langsung muncul yang baru
+            return;
         }
+
+        // kalau user milih bintang, kirim/update rating-nya juga (nggak wajib, opsional)
+        if (ratingDipilih > 0) {
+            const { error: ratingError } = await supabaseClient.from('ratings').upsert(
+                {
+                    user_id: currentUser.id,
+                    nama: currentUser.nama,
+                    nilai: ratingDipilih,
+                    komentar: pesan,
+                },
+                { onConflict: 'user_id' }
+            );
+            if (ratingError) {
+                console.error('Gagal mengirim rating:', ratingError.message);
+                alert('Pesan terkirim, tapi rating gagal: ' + ratingError.message);
+            } else {
+                muatRating(); // refresh rata-rata di halaman
+            }
+        }
+
+        alert('Pesan berhasil terkirim!');
+        formPesan.reset(); // Kosongkan form
+        if (ratingStarsWrap) {
+            ratingStarsWrap.querySelectorAll('.star-btn').forEach((btn) => btn.classList.remove('active'));
+        }
+        ratingDipilih = 0;
+        if (modal) modal.style.display = 'none'; // Tutup pop-up otomatis
+        muatPesan(); // Refresh daftar pesan agar langsung muncul yang baru
     });
 }
 
 // Jalankan otomatis saat halaman selesai di-load
 document.addEventListener('DOMContentLoaded', muatPesan);
+
+/* ==========================================================
+   10. RATING WEBSITE (digabung ke form Tulis Pesan)
+   ========================================================== */
+const ratingStarsWrap = document.getElementById('ratingStars');
+const ratingAvgText = document.getElementById('ratingAvgText');
+
+let ratingDipilih = 0; // bintang yang lagi dipilih user di modal Tulis Pesan
+
+if (ratingStarsWrap) {
+    const starBtns = ratingStarsWrap.querySelectorAll('.star-btn');
+
+    function tampilkanBintang(jumlah) {
+        starBtns.forEach((btn) => {
+            const val = Number(btn.dataset.value);
+            btn.classList.toggle('active', val <= jumlah);
+        });
+    }
+
+    // klik bintang -> pilih rating
+    starBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            ratingDipilih = Number(btn.dataset.value);
+            tampilkanBintang(ratingDipilih);
+        });
+        // hover kasih preview juga
+        btn.addEventListener('mouseenter', () => tampilkanBintang(Number(btn.dataset.value)));
+    });
+    ratingStarsWrap.addEventListener('mouseleave', () => tampilkanBintang(ratingDipilih));
+}
+
+// ambil rata-rata rating dari semua orang, ditampilkan di halaman utama
+async function muatRating() {
+    if (!ratingAvgText) return;
+
+    const { data, error } = await supabaseClient.from('ratings').select('nilai');
+
+    if (error) {
+        console.error('Gagal memuat rating:', error.message);
+        ratingAvgText.textContent = 'Rating belum bisa dimuat.';
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        ratingAvgText.textContent = 'Belum ada yang kasih rating. Jadi yang pertama!';
+        return;
+    }
+
+    const total = data.reduce((sum, r) => sum + r.nilai, 0);
+    const rataRata = (total / data.length).toFixed(1);
+    ratingAvgText.textContent = `⭐ ${rataRata} dari ${data.length} rating`;
+}
+
+// isi ulang bintang sesuai rating milik user sendiri kalau sudah pernah kasih rating sebelumnya
+async function muatRatingSaya() {
+    if (!currentUser || !ratingStarsWrap) return;
+
+    const { data } = await supabaseClient
+        .from('ratings')
+        .select('nilai')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+
+    if (data) {
+        ratingDipilih = data.nilai;
+        const starBtns = ratingStarsWrap.querySelectorAll('.star-btn');
+        starBtns.forEach((btn) => {
+            btn.classList.toggle('active', Number(btn.dataset.value) <= ratingDipilih);
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    muatRating();
+    // tunggu sesi login kebaca dulu baru cek rating milik user
+    setTimeout(muatRatingSaya, 600);
+});
 
 /* ==========================================================
    MODAL VIDEO
