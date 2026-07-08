@@ -367,8 +367,8 @@ async function muatPesan() {
         const card = document.createElement('div');
         card.className = 'message-card'; // Sesuaikan dengan nama class CSS kartu pesan Anda
         card.innerHTML = `
-            <h3>${item.nama}</h3>
-            <p>"${item.pesan}"</p>
+            <p class="pesan-nama"><strong>Pengirim:</strong> ${item.nama}</p>
+            <p class="pesan-isi"><strong>Pesan:</strong> ${item.pesan}</p>
         `;
         containerPesan.appendChild(card);
     });
