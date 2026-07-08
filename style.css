@@ -763,6 +763,42 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
 }
 
 /* ==========================================================
+   RATING WEBSITE
+   ========================================================== */
+.rating-avg {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 10px 0 0;
+  text-align: center;
+}
+
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 6px 0 4px;
+}
+
+.star-btn {
+  font-size: 26px;
+  line-height: 1;
+  color: var(--border);
+  transition: color .15s ease, transform .15s ease;
+}
+.star-btn:hover {
+  transform: scale(1.12);
+}
+.star-btn.active {
+  color: var(--sunset);
+}
+
+.rating-msg {
+  font-size: 13px;
+  margin-top: 10px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================
    PROFIL TEMAN
    ========================================================== */
 .profile-grid {
