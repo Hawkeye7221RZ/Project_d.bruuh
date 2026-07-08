@@ -525,15 +525,17 @@ function openVideoModal(title, src) {
   if (!videoModalContent) return;
 
   if (src) {
-    // ada file video -> tampilkan player asli
+    // ada file video -> tampilkan player asli, ukuran nyesuaiin video aslinya
+    videoModalContent.classList.remove('is-placeholder');
     videoModalContent.innerHTML = `
       <button class="modal-close" id="modalClose">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-      <video src="${src}" controls autoplay style="width:100%;border-radius:8px;"></video>
+      <video src="${src}" controls autoplay></video>
     `;
   } else {
-    // belum ada file video -> placeholder seperti biasa
+    // belum ada file video -> placeholder kotak 16:9 seperti biasa
+    videoModalContent.classList.add('is-placeholder');
     videoModalContent.innerHTML = `
       <button class="modal-close" id="modalClose">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>

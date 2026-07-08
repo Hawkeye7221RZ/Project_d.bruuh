@@ -679,11 +679,25 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   position: relative;
   width: 100%;
   max-width: 720px;
-  aspect-ratio: 16 / 9;
   border-radius: 12px;
+}
+
+/* mode placeholder (belum ada file video) tetap pakai kotak 16:9 rapi */
+.video-modal-content.is-placeholder {
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   background: var(--coffee);
   border: 1px solid var(--border);
+}
+
+/* mode video asli -> nggak dipaksa rasio, video nyesuaiin ukuran aslinya sendiri */
+.video-modal-content video {
+  display: block;
+  width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #000;
 }
 
 .modal-close {
@@ -1197,4 +1211,5 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   .reason-card { padding: 22px 18px; }
 
   .video-modal { padding: 12px; }
+  .video-modal-content video { max-height: 70vh; }
 }
