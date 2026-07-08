@@ -876,12 +876,34 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
 
 .message-card {
   display: flex;
-  gap: 14px;
+  flex-direction: column;
+  gap: 6px;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-left: 3px solid var(--sunset);
   border-radius: 12px;
   padding: 18px 20px;
+}
+
+.pesan-nama {
+  font-size: 16px;
+  color: var(--charcoal);
+  margin: 0;
+}
+
+.pesan-isi {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.pesan-nama strong,
+.pesan-isi strong {
+  color: var(--forest);
+  font-family: var(--font-body);
+  font-weight: 600;
+  margin-right: 4px;
 }
 
 .message-avatar {
