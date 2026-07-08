@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Kenang. — Pesan & Kesan</title>
+<title>d.bruuh_ — Pesan & Kesan</title>
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link rel="stylesheet" href="style.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -50,9 +50,9 @@
     </nav>
 
     <div class="navbar-actions">
-      <button class="btn-login">
+      <button class="btn-login" id="btnMasuk">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        Masuk
+        <span id="btnMasukText">Masuk</span>
       </button>
       <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">
         <svg class="icon-burger" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -77,48 +77,63 @@
 
   <!-- ============ MESSAGE LIST ============ -->
   <div class="message-list">
-    <div class="message-card">
-      <div class="message-avatar"></div>
-      <div class="message-body">
-        <div class="message-head">
-          <span class="message-name">Alya Ramadhani</span>
-          <span class="message-time">2 hari lalu</span>
-        </div>
-        <p class="message-text">Makasih buat 3 tahun ini, gak nyangka secepat ini. Sukses selalu buat kita semua!</p>
-      </div>
-    </div>
+  </div>
 
-    <div class="message-card">
-      <div class="message-avatar"></div>
-      <div class="message-body">
-        <div class="message-head">
-          <span class="message-name">Bima Satria</span>
-          <span class="message-time">3 hari lalu</span>
+  <!-- ============ MODAL: TULIS PESAN ============ -->
+  <div class="modal" id="modalPesan" style="display:none;">
+    <div class="modal-content">
+      <span class="close-btn" id="btnTutup">&times;</span>
+      <h2>Tulis Pesan & Kesan</h2>
+      <p class="posting-as">Menulis sebagai: <strong id="pesanNamaDisplay">-</strong></p>
+      <form id="form-pesan">
+        <div class="form-group">
+          <label for="input-pesan">Pesan</label>
+          <textarea id="input-pesan" rows="4" placeholder="Tulis pesan & kesanmu di sini..." required></textarea>
         </div>
-        <p class="message-text">Camping angkatan itu momen paling gak akan pernah aku lupain. See you on top, guys.</p>
-      </div>
+        <button type="submit" id="btnKirim">Kirim</button>
+      </form>
     </div>
+  </div>
 
-    <div class="message-card">
-      <div class="message-avatar"></div>
-      <div class="message-body">
-        <div class="message-head">
-          <span class="message-name">Citra Ayu</span>
-          <span class="message-time">5 hari lalu</span>
-        </div>
-        <p class="message-text">Kelas paling berisik tapi paling solid. Jangan hilang kontak ya semuanya!</p>
-      </div>
-    </div>
+  <!-- ============ MODAL: MASUK / DAFTAR ============ -->
+  <div class="modal" id="modalAuth" style="display:none;">
+    <div class="modal-content">
+      <span class="close-btn" id="btnTutupAuth">&times;</span>
 
-    <div class="message-card">
-      <div class="message-avatar"></div>
-      <div class="message-body">
-        <div class="message-head">
-          <span class="message-name">Dimas Prakoso</span>
-          <span class="message-time">1 minggu lalu</span>
-        </div>
-        <p class="message-text">Terima kasih udah jadi teman sekelas yang seru. Semoga kita ketemu lagi di reuni!</p>
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-tab="login">Masuk</button>
+        <button type="button" class="auth-tab" data-tab="daftar">Daftar</button>
       </div>
+
+      <form id="form-login" class="auth-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required />
+        </div>
+        <button type="submit" id="btnKirim">Masuk</button>
+        <p class="auth-msg" id="loginMsg"></p>
+      </form>
+
+      <form id="form-daftar" class="auth-form" style="display:none;">
+        <div class="form-group">
+          <label for="daftar-nama">Nama</label>
+          <input type="text" id="daftar-nama" required />
+        </div>
+        <div class="form-group">
+          <label for="daftar-email">Email</label>
+          <input type="email" id="daftar-email" required />
+        </div>
+        <div class="form-group">
+          <label for="daftar-password">Password (min. 6 karakter)</label>
+          <input type="password" id="daftar-password" minlength="6" required />
+        </div>
+        <button type="submit" id="btnKirim">Daftar</button>
+        <p class="auth-msg" id="daftarMsg"></p>
+      </form>
     </div>
   </div>
 
@@ -126,6 +141,7 @@
     <p>Dibuat dengan kenangan oleh angkatan 2025</p>
   </footer>
 
-  <script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
 </body>
 </html>

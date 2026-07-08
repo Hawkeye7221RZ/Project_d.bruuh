@@ -159,12 +159,220 @@ if (filterTabs && quickGrid) {
 /* ==========================================================
    TOMBOL "TULIS PESAN" — placeholder sebelum sistem login teman jadi
    ========================================================== */
+// 1. KONFIGURASI SUPABASE (Ganti dengan URL & Anon Key dari Project Supabase Anda)
+const SUPABASE_URL = 'https://efuqbrjuzmoxptqsstke.supabase.co'; 
+const SUPABASE_KEY = 'sb_publishable_j8xH6yMBL8QFYE-E1oohZQ_BhSMFWuU'; // Anon Key Anda
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// 2. AMBIL ELEMEN HTML
+const modal = document.getElementById('modalPesan');
 const btnTulisPesan = document.getElementById('btnTulisPesan');
-if (btnTulisPesan) {
-  btnTulisPesan.addEventListener('click', () => {
-    alert('Fitur tulis pesan bakal aktif setelah sistem login teman (invite code) selesai dibuat.');
-  });
+const btnTutup = document.getElementById('btnTutup');
+const formPesan = document.getElementById('form-pesan');
+const inputIsiPesan = document.getElementById('input-pesan');
+const pesanNamaDisplay = document.getElementById('pesanNamaDisplay');
+const containerPesan = document.querySelector('.message-list'); // Tempat list pesan di HTML
+
+const modalAuth = document.getElementById('modalAuth');
+const btnMasuk = document.getElementById('btnMasuk');
+const btnMasukText = document.getElementById('btnMasukText');
+const btnTutupAuth = document.getElementById('btnTutupAuth');
+const authTabs = document.querySelectorAll('.auth-tab');
+const formLogin = document.getElementById('form-login');
+const formDaftar = document.getElementById('form-daftar');
+const loginMsg = document.getElementById('loginMsg');
+const daftarMsg = document.getElementById('daftarMsg');
+
+let currentUser = null; // { id, nama, email }
+
+// 3. STATUS LOGIN — cek sesi saat load & pantau perubahan (login/logout)
+async function refreshUserUI() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (session && session.user) {
+        currentUser = {
+            id: session.user.id,
+            email: session.user.email,
+            nama: session.user.user_metadata?.nama || session.user.email,
+        };
+        if (btnMasukText) btnMasukText.textContent = `Keluar (${currentUser.nama})`;
+        if (pesanNamaDisplay) pesanNamaDisplay.textContent = currentUser.nama;
+    } else {
+        currentUser = null;
+        if (btnMasukText) btnMasukText.textContent = 'Masuk';
+        if (pesanNamaDisplay) pesanNamaDisplay.textContent = '-';
+    }
 }
+
+supabaseClient.auth.onAuthStateChange(() => refreshUserUI());
+refreshUserUI();
+
+// 4. TOMBOL MASUK / KELUAR DI NAVBAR
+if (btnMasuk) {
+    btnMasuk.addEventListener('click', async () => {
+        if (currentUser) {
+            await supabaseClient.auth.signOut();
+        } else if (modalAuth) {
+            modalAuth.style.display = 'flex';
+        }
+    });
+}
+
+if (btnTutupAuth) {
+    btnTutupAuth.addEventListener('click', () => {
+        if (modalAuth) modalAuth.style.display = 'none';
+    });
+}
+
+window.addEventListener('click', (e) => {
+    if (e.target === modalAuth) modalAuth.style.display = 'none';
+});
+
+// tab switch: Masuk <-> Daftar
+authTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+        authTabs.forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.dataset.tab;
+        formLogin.style.display = target === 'login' ? 'block' : 'none';
+        formDaftar.style.display = target === 'daftar' ? 'block' : 'none';
+        if (loginMsg) loginMsg.textContent = '';
+        if (daftarMsg) daftarMsg.textContent = '';
+    });
+});
+
+// 5. LOGIN
+if (formLogin) {
+    formLogin.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        loginMsg.textContent = 'Memproses...';
+
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            loginMsg.textContent = 'Gagal masuk: ' + error.message;
+        } else {
+            loginMsg.textContent = '';
+            formLogin.reset();
+            if (modalAuth) modalAuth.style.display = 'none';
+        }
+    });
+}
+
+// 6. DAFTAR (SIGN UP)
+if (formDaftar) {
+    formDaftar.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nama = document.getElementById('daftar-nama').value.trim();
+        const email = document.getElementById('daftar-email').value.trim();
+        const password = document.getElementById('daftar-password').value;
+        daftarMsg.textContent = 'Memproses...';
+
+        const { error } = await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: { data: { nama } },
+        });
+
+        if (error) {
+            daftarMsg.textContent = 'Gagal daftar: ' + error.message;
+        } else {
+            daftarMsg.style.color = '#2D5A4A';
+            daftarMsg.textContent = 'Berhasil daftar! Cek email untuk konfirmasi (jika diaktifkan), lalu masuk.';
+            formDaftar.reset();
+        }
+    });
+}
+
+// 7. LOGIKA POP-UP MODAL PESAN (Buka & Tutup) — wajib login dulu
+if (btnTulisPesan) {
+    btnTulisPesan.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!currentUser) {
+            alert('Silakan masuk dulu untuk menulis pesan.');
+            if (modalAuth) modalAuth.style.display = 'flex';
+            return;
+        }
+        if (modal) modal.style.display = 'flex';
+    });
+}
+
+if (btnTutup) {
+    btnTutup.addEventListener('click', () => {
+        if (modal) modal.style.display = 'none';
+    });
+}
+
+window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        modal.style.display = 'none';
+    }
+});
+
+// 8. AMBIL DATA DARI SUPABASE (FETCH DATA)
+async function muatPesan() {
+    if (!containerPesan) return;
+
+   const { data, error } = await supabaseClient.from('pesan_kesan') // <-- Ganti di sini
+    .select('*')
+    .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Gagal memuat pesan:', error.message);
+        return;
+    }
+
+    containerPesan.innerHTML = ''; // Hapus pesan tiruan (Alya, Bima, dll)
+
+    data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'message-card'; // Sesuaikan dengan nama class CSS kartu pesan Anda
+        card.innerHTML = `
+            <h3>${item.nama}</h3>
+            <p>"${item.pesan}"</p>
+        `;
+        containerPesan.appendChild(card);
+    });
+}
+
+// 9. KIRIM DATA KE SUPABASE (INSERT DATA) — nama diambil otomatis dari akun
+if (formPesan) {
+    formPesan.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!currentUser) {
+            alert('Sesi kamu berakhir, silakan masuk lagi.');
+            if (modal) modal.style.display = 'none';
+            if (modalAuth) modalAuth.style.display = 'flex';
+            return;
+        }
+
+        const pesan = inputIsiPesan.value.trim();
+
+        if (!pesan) {
+            alert('Pesan tidak boleh kosong!');
+            return;
+        }
+
+      const { error } = await supabaseClient.from('pesan_kesan')
+     .insert([{ nama: currentUser.nama, pesan: pesan, user_id: currentUser.id }]);
+
+        if (error) {
+            alert('Gagal mengirim: ' + error.message);
+        } else {
+            alert('Pesan berhasil terkirim!');
+            formPesan.reset(); // Kosongkan form
+            if (modal) modal.style.display = 'none'; // Tutup pop-up otomatis
+            muatPesan(); // Refresh daftar pesan agar langsung muncul yang baru
+        }
+    });
+}
+
+// Jalankan otomatis saat halaman selesai di-load
+document.addEventListener('DOMContentLoaded', muatPesan);
 
 /* ==========================================================
    MODAL VIDEO
