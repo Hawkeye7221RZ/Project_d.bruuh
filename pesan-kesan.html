@@ -93,11 +93,33 @@
     <div class="modal-content">
       <span class="close-btn" id="btnTutup">&times;</span>
       <h2>Tulis Pesan & Kesan</h2>
-      <p class="posting-as">Menulis sebagai: <strong id="pesanNamaDisplay">-</strong></p>
+
+      <div class="posting-as-row">
+        <p class="posting-as">Menulis sebagai: <strong id="pesanNamaDisplay">-</strong></p>
+        <button type="button" id="btnUbahNama" class="link-btn">Ubah nama</button>
+      </div>
+
+      <div class="form-group ubah-nama-group" id="ubahNamaGroup" style="display:none;">
+        <label for="input-nama-baru">Nama Baru</label>
+        <input type="text" id="input-nama-baru" placeholder="Masukkan nama baru" maxlength="40" />
+        <div class="ubah-nama-actions">
+          <button type="button" id="btnSimpanNama" class="btn-mini btn-mini-primary">Simpan</button>
+          <button type="button" id="btnBatalNama" class="btn-mini">Batal</button>
+        </div>
+        <p class="ubah-nama-msg" id="ubahNamaMsg"></p>
+      </div>
+
       <form id="form-pesan">
         <div class="form-group">
           <label for="input-pesan">Pesan</label>
           <textarea id="input-pesan" rows="4" placeholder="Tulis pesan & kesanmu di sini..." required></textarea>
+        </div>
+
+        <div class="form-group form-group-checkbox">
+          <label class="checkbox-label" for="checkAnonim">
+            <input type="checkbox" id="checkAnonim" />
+            Kirim pesan ini sebagai Anonim
+          </label>
         </div>
 
         <div class="form-group">

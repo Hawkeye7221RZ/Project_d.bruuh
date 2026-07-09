@@ -387,6 +387,16 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   margin-bottom: 32px;
 }
 
+.btn-tambah-foto {
+  margin-left: 12px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+@media (max-width: 768px) {
+  .btn-tambah-foto { margin-left: 0; width: 100%; justify-content: center; }
+}
+
 .tab {
   display: flex;
   align-items: center;
@@ -661,10 +671,82 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
 }
 #btnKirim:hover { background-color: #d16b4e; }
 
+#btnUnggahFoto {
+  background-color: #e27c5f; color: white; border: none; padding: 10px 20px;
+  border-radius: 20px; cursor: pointer; width: 100%; font-weight: bold;
+}
+#btnUnggahFoto:hover { background-color: #d16b4e; }
+#btnUnggahFoto:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.posting-as-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: -6px 0 16px;
+}
 .posting-as {
   font-size: 13px;
   color: var(--text-muted, #666);
-  margin: -6px 0 16px;
+  margin: 0;
+}
+.posting-as-row .link-btn {
+  font-size: 12px;
+  white-space: nowrap;
+  text-decoration: underline;
+}
+
+.ubah-nama-group {
+  background: #F4F1EA;
+  border: 1px solid #e0d6c2;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: -8px 0 16px;
+}
+.ubah-nama-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.btn-mini {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 16px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #444;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-mini:hover { background: #eee; }
+.btn-mini-primary {
+  background: var(--forest, #2D5A4A);
+  border-color: var(--forest, #2D5A4A);
+  color: #fff;
+}
+.btn-mini-primary:hover { background: var(--sunset, #E07A5F); border-color: var(--sunset, #E07A5F); }
+.ubah-nama-msg {
+  font-size: 12px;
+  margin: 8px 0 0;
+  min-height: 14px;
+  color: #c0392b;
+}
+
+.form-group-checkbox { margin-bottom: 18px; }
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+}
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--forest, #2D5A4A);
+  cursor: pointer;
 }
 
 .auth-tabs {
