@@ -213,6 +213,8 @@ const containerPesan = document.querySelector('.message-list'); // Tempat list p
 const modalAuth = document.getElementById('modalAuth');
 const btnMasuk = document.getElementById('btnMasuk');
 const btnMasukText = document.getElementById('btnMasukText');
+const btnLoginInitial = document.getElementById('btnLoginInitial');
+const navAccountStatus = document.getElementById('navAccountStatus');
 const btnTutupAuth = document.getElementById('btnTutupAuth');
 const authTabs = document.querySelectorAll('.auth-tab');
 const formLogin = document.getElementById('form-login');
@@ -223,6 +225,10 @@ const daftarMsg = document.getElementById('daftarMsg');
 let currentUser = null; // { id, nama, email }
 
 // 3. STATUS LOGIN — cek sesi saat load & pantau perubahan (login/logout)
+//    Status ditandai lewat 3 hal biar jelas di HP maupun laptop:
+//    1) warna tombol (abu-abu = tamu, oranye = udah masuk)
+//    2) titik kecil di avatar (abu-abu = belum masuk, hijau = udah masuk)
+//    3) baris status di dalam panel menu HP ("Belum masuk" / "Masuk sebagai ...")
 async function refreshUserUI() {
     const { data: { session } } = await supabaseClient.auth.getSession();
 
@@ -232,12 +238,33 @@ async function refreshUserUI() {
             email: session.user.email,
             nama: session.user.user_metadata?.nama || session.user.email,
         };
-        if (btnMasukText) btnMasukText.textContent = `Keluar (${currentUser.nama})`;
+        const inisial = currentUser.nama.trim().charAt(0).toUpperCase();
+
+        if (btnMasuk) {
+            btnMasuk.classList.add('is-logged-in');
+            btnMasuk.title = `Masuk sebagai ${currentUser.nama} — klik untuk keluar`;
+        }
+        if (btnMasukText) btnMasukText.textContent = 'Keluar';
+        if (btnLoginInitial) btnLoginInitial.textContent = inisial;
         if (pesanNamaDisplay) pesanNamaDisplay.textContent = currentUser.nama;
+        if (navAccountStatus) {
+            navAccountStatus.textContent = `Masuk sebagai ${currentUser.nama}`;
+            navAccountStatus.classList.add('is-logged-in');
+        }
     } else {
         currentUser = null;
+
+        if (btnMasuk) {
+            btnMasuk.classList.remove('is-logged-in');
+            btnMasuk.title = 'Klik untuk masuk';
+        }
         if (btnMasukText) btnMasukText.textContent = 'Masuk';
+        if (btnLoginInitial) btnLoginInitial.textContent = '';
         if (pesanNamaDisplay) pesanNamaDisplay.textContent = '-';
+        if (navAccountStatus) {
+            navAccountStatus.textContent = 'Belum masuk';
+            navAccountStatus.classList.remove('is-logged-in');
+        }
     }
 }
 
@@ -248,6 +275,8 @@ refreshUserUI();
 if (btnMasuk) {
     btnMasuk.addEventListener('click', async () => {
         if (currentUser) {
+            const yakin = confirm(`Keluar dari akun ${currentUser.nama}?`);
+            if (!yakin) return;
             await supabaseClient.auth.signOut();
         } else if (modalAuth) {
             modalAuth.style.display = 'flex';

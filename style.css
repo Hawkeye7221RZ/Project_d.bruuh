@@ -134,7 +134,88 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   justify-self: end;
 }
 
-.nav-links-logo { display: none; } /* cuma muncul di panel menu HP */
+/* ==========================================================
+   TOMBOL AKUN (Masuk / Keluar) — navbar
+   ========================================================== */
+.btn-login {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 999px;
+  background: rgba(244, 241, 234, 0.08);
+  border: 1px solid rgba(244, 241, 234, 0.22);
+  color: #F4F1EA;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background .2s ease, border-color .2s ease, transform .15s ease;
+}
+.btn-login:hover { background: rgba(244, 241, 234, 0.16); }
+.btn-login:active { transform: scale(0.97); }
+
+/* Lingkaran avatar/ikon — SELALU kelihatan, di semua ukuran layar */
+.btn-login-avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(244, 241, 234, 0.14);
+  color: #F4F1EA;
+}
+.btn-login-avatar .icon-guest { display: block; }
+.btn-login-initial {
+  display: none;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Titik status — abu-abu = belum masuk, hijau = sudah masuk. Ini kunci biar status kebaca di HP */
+.btn-login-dot {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(244, 241, 234, 0.4);
+  border: 2px solid var(--forest);
+  transition: background .2s ease;
+}
+
+.btn-login-label { white-space: nowrap; }
+
+/* State: sudah masuk -> tombol berubah warna + avatar jadi inisial + titik ijo */
+.btn-login.is-logged-in {
+  background: var(--sunset);
+  border-color: var(--sunset);
+}
+.btn-login.is-logged-in:hover { background: #d96b4f; }
+.btn-login.is-logged-in .btn-login-avatar { background: rgba(244, 241, 234, 0.28); }
+.btn-login.is-logged-in .icon-guest { display: none; }
+.btn-login.is-logged-in .btn-login-initial { display: block; }
+.btn-login.is-logged-in .btn-login-dot { background: #4CAF7D; }
+
+.nav-links-logo {
+  display: none; /* cuma muncul di panel menu HP */
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Status akun yang muncul di dalam panel menu HP, biar jelas walau tombol navbar diringkas */
+.nav-account-status {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.nav-account-status.is-logged-in { color: var(--forest); font-weight: 600; }
 
 .nav-dropdown-btn:focus,
 .nav-dropdown-btn:focus-visible {
@@ -1162,9 +1243,10 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
 @media (max-width: 480px) {
   .navbar { padding: 10px 16px; }
   .logo-link { height: 24px; }
-  .btn-login span,
-  .btn-login { font-size: 0; padding: 8px; gap: 0; } /* sisain ikonnya aja biar gak sempit */
-  .btn-login svg { font-size: initial; }
+  .btn-login { padding: 5px; gap: 0; border-width: 1.5px; } /* teks disembunyikan, tapi avatar + titik status tetap keliatan */
+  .btn-login-label { display: none; }
+  .btn-login-avatar { width: 28px; height: 28px; }
+  .btn-login-dot { width: 11px; height: 11px; }
 
   /* Hero jadi lebih tinggi (bukan panorama 21:9) supaya wajah orang gak kegepeng */
   .hero { margin: 16px 16px 0; aspect-ratio: 4 / 5; border-radius: 12px; }
