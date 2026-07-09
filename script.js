@@ -167,7 +167,6 @@ const emptyState = document.getElementById('emptyState');
 
 if (filterTabs && quickGrid) {
   const tabs = filterTabs.querySelectorAll('.tab');
-  const cards = quickGrid.querySelectorAll('.photo-card');
 
   filterTabs.addEventListener('click', (e) => {
     const btn = e.target.closest('.tab');
@@ -179,6 +178,9 @@ if (filterTabs && quickGrid) {
 
     const filter = btn.dataset.filter;
     let visibleCount = 0;
+
+    // query ulang setiap klik, biar foto yang baru diupload ikut kefilter juga
+    const cards = quickGrid.querySelectorAll('.photo-card');
 
     cards.forEach((card) => {
       const match = filter === 'Semua' || card.dataset.category === filter;
@@ -209,6 +211,15 @@ const formPesan = document.getElementById('form-pesan');
 const inputIsiPesan = document.getElementById('input-pesan');
 const pesanNamaDisplay = document.getElementById('pesanNamaDisplay');
 const containerPesan = document.querySelector('.message-list'); // Tempat list pesan di HTML
+const checkAnonim = document.getElementById('checkAnonim');
+
+// -- Ubah Nama --
+const btnUbahNama = document.getElementById('btnUbahNama');
+const ubahNamaGroup = document.getElementById('ubahNamaGroup');
+const inputNamaBaru = document.getElementById('input-nama-baru');
+const btnSimpanNama = document.getElementById('btnSimpanNama');
+const btnBatalNama = document.getElementById('btnBatalNama');
+const ubahNamaMsg = document.getElementById('ubahNamaMsg');
 
 const modalAuth = document.getElementById('modalAuth');
 const btnMasuk = document.getElementById('btnMasuk');
@@ -268,8 +279,87 @@ async function refreshUserUI() {
     }
 }
 
-supabaseClient.auth.onAuthStateChange(() => refreshUserUI());
-refreshUserUI();
+supabaseClient.auth.onAuthStateChange(() => {
+    refreshUserUI().then(checkIsAdmin);
+});
+refreshUserUI().then(checkIsAdmin);
+
+// 3a. CEK STATUS ADMIN — dipakai buat nampilin tombol "Tambah Foto"
+const btnTambahFoto = document.getElementById('btnTambahFoto');
+let isAdmin = false;
+
+async function checkIsAdmin() {
+    if (!btnTambahFoto) return; // halaman ini gak punya tombol upload foto
+
+    if (!currentUser) {
+        isAdmin = false;
+        btnTambahFoto.style.display = 'none';
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('admins')
+        .select('user_id')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+
+    isAdmin = !error && !!data;
+    btnTambahFoto.style.display = isAdmin ? '' : 'none';
+}
+
+// 3b. UBAH NAMA — user bisa ganti nama tampilan akunnya sendiri
+if (btnUbahNama) {
+    btnUbahNama.addEventListener('click', () => {
+        if (!currentUser) {
+            alert('Silakan masuk dulu untuk mengubah nama.');
+            if (modalAuth) modalAuth.style.display = 'flex';
+            return;
+        }
+        inputNamaBaru.value = currentUser.nama;
+        if (ubahNamaMsg) ubahNamaMsg.textContent = '';
+        ubahNamaGroup.style.display = 'block';
+        inputNamaBaru.focus();
+    });
+}
+
+if (btnBatalNama) {
+    btnBatalNama.addEventListener('click', () => {
+        ubahNamaGroup.style.display = 'none';
+        if (ubahNamaMsg) ubahNamaMsg.textContent = '';
+    });
+}
+
+if (btnSimpanNama) {
+    btnSimpanNama.addEventListener('click', async () => {
+        const namaBaru = inputNamaBaru.value.trim();
+
+        if (!namaBaru) {
+            ubahNamaMsg.textContent = 'Nama tidak boleh kosong.';
+            return;
+        }
+        if (namaBaru.length > 40) {
+            ubahNamaMsg.textContent = 'Nama maksimal 40 karakter.';
+            return;
+        }
+
+        ubahNamaMsg.style.color = '#666';
+        ubahNamaMsg.textContent = 'Menyimpan...';
+
+        const { error } = await supabaseClient.auth.updateUser({
+            data: { nama: namaBaru },
+        });
+
+        if (error) {
+            ubahNamaMsg.style.color = '#c0392b';
+            ubahNamaMsg.textContent = 'Gagal menyimpan: ' + error.message;
+            return;
+        }
+
+        await refreshUserUI(); // update tampilan nama di navbar & modal
+        ubahNamaGroup.style.display = 'none';
+        ubahNamaMsg.textContent = '';
+    });
+}
 
 // 4. TOMBOL MASUK / KELUAR DI NAVBAR
 if (btnMasuk) {
@@ -422,8 +512,11 @@ if (formPesan) {
             return;
         }
 
+        // kalau centang "Kirim sebagai Anonim", nama akun asli tidak dipakai buat pesan ini
+        const namaKirim = (checkAnonim && checkAnonim.checked) ? 'Anonim' : currentUser.nama;
+
       const { error } = await supabaseClient.from('pesan_kesan')
-     .insert([{ nama: currentUser.nama, pesan: pesan, user_id: currentUser.id }]);
+     .insert([{ nama: namaKirim, pesan: pesan, user_id: currentUser.id }]);
 
         if (error) {
             alert('Gagal mengirim: ' + error.message);
@@ -435,7 +528,7 @@ if (formPesan) {
             const { error: ratingError } = await supabaseClient.from('ratings').upsert(
                 {
                     user_id: currentUser.id,
-                    nama: currentUser.nama,
+                    nama: namaKirim,
                     nilai: ratingDipilih,
                     komentar: pesan,
                 },
@@ -455,6 +548,7 @@ if (formPesan) {
             ratingStarsWrap.querySelectorAll('.star-btn').forEach((btn) => btn.classList.remove('active'));
         }
         ratingDipilih = 0;
+        if (checkAnonim) checkAnonim.checked = false;
         if (modal) modal.style.display = 'none'; // Tutup pop-up otomatis
         muatPesan(); // Refresh daftar pesan agar langsung muncul yang baru
     });
@@ -539,6 +633,163 @@ document.addEventListener('DOMContentLoaded', () => {
     // tunggu sesi login kebaca dulu baru cek rating milik user
     setTimeout(muatRatingSaya, 600);
 });
+
+/* ==========================================================
+   GALERI FOTO — upload oleh admin, tayang otomatis (tanpa VSCode)
+   ========================================================== */
+const modalFoto = document.getElementById('modalFoto');
+const btnTutupFoto = document.getElementById('btnTutupFoto');
+const formFoto = document.getElementById('form-foto');
+const inputFotoFile = document.getElementById('input-foto-file');
+const inputFotoCaption = document.getElementById('input-foto-caption');
+const inputFotoKategori = document.getElementById('input-foto-kategori');
+const fotoMsg = document.getElementById('fotoMsg');
+const galleryGridEl = document.querySelector('.gallery-grid');
+
+// escape teks user biar aman dimasukkan lewat innerHTML
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str ?? '';
+    return div.innerHTML;
+}
+
+function buatPhotoCard(item) {
+    const div = document.createElement('div');
+    div.className = 'photo-card';
+    div.dataset.category = item.kategori;
+    div.innerHTML = `
+        <img src="${item.url}" alt="${escapeHtml(item.caption)}" style="width:100%; height:100%; object-fit:cover;">
+        <div class="photo-caption">${escapeHtml(item.caption)}</div>
+    `;
+    return div;
+}
+
+function buatGalleryCard(item) {
+    const div = document.createElement('div');
+    div.className = 'gallery-card';
+    div.innerHTML = `
+        <img src="${item.url}" alt="${escapeHtml(item.caption)}" style="width:100%; height:100%; object-fit:cover;">
+        <div class="gallery-overlay"><span class="tag">${escapeHtml(item.kategori)}</span><span class="caption">${escapeHtml(item.caption)}</span></div>
+    `;
+    return div;
+}
+
+// tempel 1 foto baru di paling atas kedua grid, langsung ikut filter aktif
+function tempelFotoBaru(item) {
+    if (quickGrid) {
+        const card = buatPhotoCard(item);
+        const filterAktif = filterTabs?.querySelector('.tab.active')?.dataset.filter || 'Semua';
+        if (filterAktif !== 'Semua' && filterAktif !== item.kategori) {
+            card.style.display = 'none';
+        }
+        quickGrid.prepend(card);
+        if (emptyState) {
+            const adaYangKeliatan = [...quickGrid.querySelectorAll('.photo-card')].some(c => c.style.display !== 'none');
+            emptyState.hidden = adaYangKeliatan;
+        }
+    }
+    if (galleryGridEl) {
+        galleryGridEl.prepend(buatGalleryCard(item));
+    }
+}
+
+// ambil semua foto yang pernah diupload, taruh di atas foto statis yang lama
+async function muatGaleriFoto() {
+    if (!quickGrid && !galleryGridEl) return; // bukan halaman beranda, skip
+
+    const { data, error } = await supabaseClient
+        .from('galeri_foto')
+        .select('*')
+        .order('created_at', { ascending: true }); // urut lama->baru, ditempel satu-satu di atas
+
+    if (error) {
+        console.error('Gagal memuat galeri foto:', error.message);
+        return;
+    }
+
+    data.forEach((item) => tempelFotoBaru(item));
+}
+
+document.addEventListener('DOMContentLoaded', muatGaleriFoto);
+
+// buka modal upload (tombol ini cuma keliatan kalau isAdmin true)
+if (btnTambahFoto) {
+    btnTambahFoto.addEventListener('click', () => {
+        if (!isAdmin) return; // jaga-jaga
+        if (fotoMsg) fotoMsg.textContent = '';
+        if (modalFoto) modalFoto.style.display = 'flex';
+    });
+}
+
+if (btnTutupFoto) {
+    btnTutupFoto.addEventListener('click', () => {
+        if (modalFoto) modalFoto.style.display = 'none';
+    });
+}
+
+window.addEventListener('click', (e) => {
+    if (e.target === modalFoto) modalFoto.style.display = 'none';
+});
+
+// submit form upload: kirim file ke Storage, lalu simpan metadatanya ke tabel
+if (formFoto) {
+    formFoto.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!currentUser || !isAdmin) {
+            alert('Hanya admin yang bisa menambah foto.');
+            return;
+        }
+
+        const file = inputFotoFile.files[0];
+        const caption = inputFotoCaption.value.trim();
+        const kategori = inputFotoKategori.value;
+
+        if (!file) {
+            fotoMsg.textContent = 'Pilih file foto dulu.';
+            return;
+        }
+        if (!caption) {
+            fotoMsg.textContent = 'Keterangan foto tidak boleh kosong.';
+            return;
+        }
+
+        fotoMsg.style.color = '#666';
+        fotoMsg.textContent = 'Mengunggah foto...';
+
+        const ext = file.name.split('.').pop();
+        const namaFile = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+        const { error: uploadError } = await supabaseClient.storage
+            .from('galeri')
+            .upload(namaFile, file);
+
+        if (uploadError) {
+            fotoMsg.style.color = '#c0392b';
+            fotoMsg.textContent = 'Gagal upload file: ' + uploadError.message;
+            return;
+        }
+
+        const { data: urlData } = supabaseClient.storage.from('galeri').getPublicUrl(namaFile);
+        const publicUrl = urlData.publicUrl;
+
+        const itemBaru = { url: publicUrl, caption, kategori, uploaded_by: currentUser.id };
+
+        const { error: insertError } = await supabaseClient.from('galeri_foto').insert([itemBaru]);
+
+        if (insertError) {
+            fotoMsg.style.color = '#c0392b';
+            fotoMsg.textContent = 'Foto keupload, tapi gagal disimpan: ' + insertError.message;
+            return;
+        }
+
+        tempelFotoBaru(itemBaru); // langsung tampil tanpa perlu reload
+        formFoto.reset();
+        fotoMsg.textContent = '';
+        if (modalFoto) modalFoto.style.display = 'none';
+        alert('Foto berhasil ditambahkan ke galeri!');
+    });
+}
 
 /* ==========================================================
    MODAL VIDEO
