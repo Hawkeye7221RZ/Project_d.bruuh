@@ -21,7 +21,10 @@
     </a>
 
     <nav class="nav-links" id="navLinks">
-      <div class="nav-links-logo"><img src="assets/logoh.png" alt="Logo" /></div>
+      <div class="nav-links-logo">
+        <img src="assets/logoh.png" alt="Logo" />
+        <p class="nav-account-status" id="navAccountStatus">Belum masuk</p>
+      </div>
       <a href="index.html" class="active">Beranda</a>
 
       <div class="nav-dropdown">
@@ -51,9 +54,13 @@
     </nav>
 
     <div class="navbar-actions">
-      <button class="btn-login" id="btnMasuk">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        <span id="btnMasukText">Masuk</span>
+      <button class="btn-login" id="btnMasuk" type="button" title="Klik untuk masuk">
+        <span class="btn-login-avatar" id="btnLoginAvatar" aria-hidden="true">
+          <svg class="icon-guest" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          <span class="btn-login-initial" id="btnLoginInitial"></span>
+          <span class="btn-login-dot" id="btnLoginDot"></span>
+        </span>
+        <span class="btn-login-label" id="btnMasukText">Masuk</span>
       </button>
       <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">
         <svg class="icon-burger" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
