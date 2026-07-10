@@ -285,36 +285,39 @@
       <h2>Video Momen</h2>
     </div>
 
-    <div class="video-grid" id="videoGrid">
-      <button class="video-card" data-title="Recap 3 Tahun" data-duration="0:21" data-src="assets/videos/bikinkopi.mp4">
-        <span class="play-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        </span>
-        <div class="video-info">
-          <p class="video-title">Bikin kopi</p>
-          <span class="video-duration">0:21</span>
-        </div>
-      </button>
-      <button class="video-card" data-title="Camping Angkatan 2024" data-duration="0:31" data-src="assets/videos/perjalananRiam.mp4">
-        <span class="play-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        </span>
-        <div class="video-info">
-          <p class="video-title">Riam Merasap 2024</p>
-          <span class="video-duration">0:31</span>
-        </div>
-      </button>
-      <button class="video-card" data-title="Detik-detik Kelulusan" data-duration="0:31" data-src="assets/videos/pantai.mp4">
-        <span class="play-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        </span>
-        <div class="video-info">
-          <p class="video-title">Pantai SamudraIndah - Singkawang</p>
-          <span class="video-duration">0:35</span>
-        </div>
+    <div class="page-cta">
+      <button class="btn-primary" id="btnTambahVideo" type="button" style="display:none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Tambah Video
       </button>
     </div>
+
+    <div class="video-grid" id="videoGrid"></div>
   </section>
+
+  <!-- ============ MODAL: TAMBAH/EDIT VIDEO (khusus admin) ============ -->
+  <div class="modal" id="modalVideoForm" style="display:none;">
+    <div class="modal-content">
+      <span class="close-btn" id="btnTutupVideoForm">&times;</span>
+      <h2 id="modalVideoFormTitle">Tambah Video</h2>
+      <form id="form-video">
+        <div class="form-group">
+          <label for="input-video-file">File Video</label>
+          <input type="file" id="input-video-file" accept="video/*" />
+        </div>
+        <div class="form-group">
+          <label for="input-video-judul">Judul</label>
+          <input type="text" id="input-video-judul" placeholder="Contoh: Camping Singkawang" maxlength="80" required />
+        </div>
+        <div class="form-group">
+          <label for="input-video-durasi">Durasi</label>
+          <input type="text" id="input-video-durasi" placeholder="Contoh: 0:35" maxlength="10" />
+        </div>
+        <button type="submit" id="btnSimpanVideo">Simpan Video</button>
+        <p class="auth-msg" id="videoFormMsg"></p>
+      </form>
+    </div>
+  </div>
 
   <!-- ============ VIDEO MODAL ============ -->
   <div class="video-modal" id="videoModal">
@@ -375,7 +378,7 @@
   <div class="modal" id="modalFoto" style="display:none;">
     <div class="modal-content">
       <span class="close-btn" id="btnTutupFoto">&times;</span>
-      <h2>Tambah Foto ke Galeri</h2>
+      <h2 id="modalFotoTitle">Tambah Foto ke Galeri</h2>
       <form id="form-foto">
         <div class="form-group">
           <label for="input-foto-file">Pilih Foto</label>

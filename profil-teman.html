@@ -76,103 +76,41 @@
     <p>Wajah dari warga-warga d.bruuh</p>
   </div>
 
-  <!-- ============ PROFILE GRID ============ -->
-  <div class="profile-grid">
-    <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/abi.jpeg"></div>
-      <p class="profile-name">Abi</p>
-      <p class="profile-class">@caesarabigail</p>
-      <p class="profile-quote">"Every step matters."</p>
-    </div>
-    <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/ahmed.jpeg"></div>
-      <p class="profile-name">Ahmed</p>
-      <p class="profile-class">@nbltdz</p>
-      <p class="profile-quote">"Gapapa asing yang penting udah gaya miring" #bebaskanresbob</p>
-    </div>
-    <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/arap.jpeg"></div>
-      <p class="profile-name">Arap</p>
-      <p class="profile-class">@middleast_</p>
-      <p class="profile-quote">"Hai, aku araf"</p>
-    </div>
-    <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/azril.jpeg"></div>
-      <p class="profile-name">Azril</p>
-      <p class="profile-class">@azrlazraa</p>
-      <p class="profile-quote">"Yang sudah liat, boleh exit"</p>
-    </div>
-    <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/dary.jpeg"></div>
-      <p class="profile-name">Dary</p>
-      <p class="profile-class">@darywjdn</p>
-      <p class="profile-quote">"Orang gendut mirip babi"</p>
-    </div>
-    <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/evan.jpeg"></div>
-      <p class="profile-name">Evan</p>
-      <p class="profile-class">@epan.mlyn</p>
-      <p class="profile-quote">"Kitchen"</p>
-    </div>
-    <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/fakhri.jpeg"></div>
-      <p class="profile-name">Fakhri</p>
-      <p class="profile-class">@fkhri.adty</p>
-      <p class="profile-quote">"Pembenci paris dan dary"</p>
-    </div>
-    <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/faris.jpeg"></div>
-      <p class="profile-name">Faris</p>
-      <p class="profile-class">@far1ses</p>
-      <p class="profile-quote">"Pas kecil adu ranking, pas dewasa adu alat kencing."</p>
-    </div>
-        <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/iyan.jpeg"></div>
-      <p class="profile-name">Iyan</p>
-      <p class="profile-class">@febry4nz</p>
-      <p class="profile-quote">"Semangat semuanya, jangan lupa tidur."</p>
-    </div>
-    <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/koko.jpeg"></div>
-      <p class="profile-name">Koko</p>
-      <p class="profile-class">@putrarizsky</p>
-      <p class="profile-quote">"Sehat-sehat orang sehat"</p>
-    </div>
-        <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/cumy.jpeg"></div>
-      <p class="profile-name">Nabil/Cumy</p>
-      <p class="profile-class">@cumy_la</p>
-      <p class="profile-quote">"Haters faris dan fakhri sejak 2k26"</p>
-    </div>
-        <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/ndrong.jpeg"></div>
-      <p class="profile-name">Rafi (ndrong)</p>
-      <p class="profile-class">@ravso07</p>
-      <p class="profile-quote">"Gadis koleris yang suka berimajinasi."</p>
-    </div>
-        <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/abah.jpeg"></div>
-      <p class="profile-name">Rafi (abah)</p>
-      <p class="profile-class">@its.piii_</p>
-      <p class="profile-quote">"Gitar dan api unggun, cukup itu aja."</p>
-    </div>
-        <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/raihan.jpeg"></div>
-      <p class="profile-name">Raihan</p>
-      <p class="profile-class">@mhmmdrhnkbr_</p>
-      <p class="profile-quote">"Gitar dan api unggun, cukup itu aja."</p>
-    </div>
-        <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/rendy.jpeg"></div>
-      <p class="profile-name">Rendy</p>
-      <p class="profile-class">@rndy.nvy</p>
-      <p class="profile-quote">"Ga bisa di ulang, cukup di kenang."</p>
-    </div>
-        <div class="profile-card">
-      <div class="profile-avatar"><img src="assets/reno.jpeg"></div>
-      <p class="profile-name">Reno</p>
-      <p class="profile-class">@renooree_</p>
-      <p class="profile-quote">"Gitar dan api unggun, cukup itu aja."</p>
+  <div class="page-cta">
+    <button class="btn-primary" id="btnTambahMember" type="button" style="display:none;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Tambah Member
+    </button>
+  </div>
+
+  <!-- ============ PROFILE GRID (dimuat dari database) ============ -->
+  <div class="profile-grid" id="memberGrid"></div>
+
+  <!-- ============ MODAL: TAMBAH/EDIT MEMBER (khusus admin) ============ -->
+  <div class="modal" id="modalMember" style="display:none;">
+    <div class="modal-content">
+      <span class="close-btn" id="btnTutupMember">&times;</span>
+      <h2 id="modalMemberTitle">Tambah Member</h2>
+      <form id="form-member">
+        <div class="form-group">
+          <label for="input-member-avatar">Foto Profil</label>
+          <input type="file" id="input-member-avatar" accept="image/*" />
+        </div>
+        <div class="form-group">
+          <label for="input-member-nama">Nama</label>
+          <input type="text" id="input-member-nama" placeholder="Contoh: Iyan" maxlength="60" required />
+        </div>
+        <div class="form-group">
+          <label for="input-member-username">Username</label>
+          <input type="text" id="input-member-username" placeholder="Contoh: @febry4nz" maxlength="60" />
+        </div>
+        <div class="form-group">
+          <label for="input-member-quote">Quote</label>
+          <input type="text" id="input-member-quote" placeholder="Kutipan singkat" maxlength="150" />
+        </div>
+        <button type="submit" id="btnSimpanMember">Simpan Member</button>
+        <p class="auth-msg" id="memberMsg"></p>
+      </form>
     </div>
   </div>
 
