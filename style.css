@@ -59,6 +59,8 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   display: flex;
   align-items: center;
   height: 30px;
+  justify-self: start;
+  width: fit-content;
 }
 .logo-img {
   height: 340%;
@@ -464,6 +466,33 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   transition: opacity .25s;
 }
 .photo-card:hover .photo-caption { opacity: 1; }
+
+.photo-admin-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: none;
+  gap: 6px;
+  z-index: 2;
+}
+body.is-admin .photo-admin-actions { display: flex; }
+
+.photo-edit-btn,
+.photo-delete-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(43, 43, 43, 0.75);
+  color: #F4F1EA;
+  transition: background .2s, transform .2s;
+}
+.photo-edit-btn:hover { background: var(--forest); transform: scale(1.08); }
+.photo-delete-btn:hover { background: #c0392b; transform: scale(1.08); }
 
 .empty-state {
   text-align: center;
@@ -988,6 +1017,7 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
 }
 
 .profile-card {
+  position: relative;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -998,6 +1028,21 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
 .profile-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 28px rgba(43, 43, 43, 0.1);
+}
+
+.card-admin-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none;
+  gap: 6px;
+  z-index: 2;
+}
+body.is-admin .card-admin-actions { display: flex; }
+
+.card-admin-actions .photo-edit-btn,
+.card-admin-actions .photo-delete-btn {
+  background: rgba(43, 43, 43, 0.55);
 }
 
 .profile-avatar {
@@ -1074,6 +1119,26 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   line-height: 1.6;
   margin: 0;
 }
+
+.pesan-admin-row {
+  display: none;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+body.is-admin .pesan-admin-row { display: flex; }
+
+.pesan-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #c0392b;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(192, 57, 43, 0.3);
+  transition: background .2s;
+}
+.pesan-delete-btn:hover { background: rgba(192, 57, 43, 0.1); }
 
 .pesan-nama strong,
 .pesan-isi strong {

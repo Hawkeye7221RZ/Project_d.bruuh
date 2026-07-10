@@ -284,16 +284,19 @@ supabaseClient.auth.onAuthStateChange(() => {
 });
 refreshUserUI().then(checkIsAdmin);
 
-// 3a. CEK STATUS ADMIN — dipakai buat nampilin tombol "Tambah Foto"
+// 3a. CEK STATUS ADMIN — dipakai di semua halaman buat nampilin tombol admin (foto/member/video/pesan)
 const btnTambahFoto = document.getElementById('btnTambahFoto');
+const btnTambahMember = document.getElementById('btnTambahMember');
+const btnTambahVideo = document.getElementById('btnTambahVideo');
 let isAdmin = false;
 
 async function checkIsAdmin() {
-    if (!btnTambahFoto) return; // halaman ini gak punya tombol upload foto
-
     if (!currentUser) {
         isAdmin = false;
-        btnTambahFoto.style.display = 'none';
+        document.body.classList.remove('is-admin');
+        if (btnTambahFoto) btnTambahFoto.style.display = 'none';
+        if (btnTambahMember) btnTambahMember.style.display = 'none';
+        if (btnTambahVideo) btnTambahVideo.style.display = 'none';
         return;
     }
 
@@ -304,7 +307,11 @@ async function checkIsAdmin() {
         .maybeSingle();
 
     isAdmin = !error && !!data;
-    btnTambahFoto.style.display = isAdmin ? '' : 'none';
+    document.body.classList.toggle('is-admin', isAdmin);
+
+    if (btnTambahFoto) btnTambahFoto.style.display = isAdmin ? '' : 'none';
+    if (btnTambahMember) btnTambahMember.style.display = isAdmin ? '' : 'none';
+    if (btnTambahVideo) btnTambahVideo.style.display = isAdmin ? '' : 'none';
 }
 
 // 3b. UBAH NAMA — user bisa ganti nama tampilan akunnya sendiri
@@ -485,11 +492,43 @@ async function muatPesan() {
     data.forEach(item => {
         const card = document.createElement('div');
         card.className = 'message-card'; // Sesuaikan dengan nama class CSS kartu pesan Anda
+        card.dataset.pesanId = item.id;
         card.innerHTML = `
             <p class="pesan-nama"><strong>Pengirim:</strong> ${item.nama}</p>
             <p class="pesan-isi"><strong>Pesan:</strong> ${item.pesan}</p>
+            <div class="pesan-admin-row">
+              <button type="button" class="pesan-delete-btn" title="Hapus pesan ini">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                Hapus
+              </button>
+            </div>
         `;
         containerPesan.appendChild(card);
+    });
+}
+
+// klik tombol hapus pesan (khusus admin, buat moderasi pesan orang lain)
+if (containerPesan) {
+    containerPesan.addEventListener('click', async (e) => {
+        const delBtn = e.target.closest('.pesan-delete-btn');
+        if (!delBtn) return;
+        if (!isAdmin) return;
+
+        const card = e.target.closest('.message-card');
+        const pesanId = card?.dataset.pesanId;
+        if (!card || !pesanId) return;
+
+        const yakin = confirm('Yakin mau hapus pesan ini?');
+        if (!yakin) return;
+
+        const { error } = await supabaseClient.from('pesan_kesan').delete().eq('id', pesanId);
+
+        if (error) {
+            alert('Gagal menghapus pesan: ' + error.message);
+            return;
+        }
+
+        card.remove();
     });
 }
 
@@ -643,8 +682,14 @@ const formFoto = document.getElementById('form-foto');
 const inputFotoFile = document.getElementById('input-foto-file');
 const inputFotoCaption = document.getElementById('input-foto-caption');
 const inputFotoKategori = document.getElementById('input-foto-kategori');
+const modalFotoTitle = document.getElementById('modalFotoTitle');
+const btnUnggahFoto = document.getElementById('btnUnggahFoto');
+
+// state buat nandain lagi mode edit atau tambah baru
+let editingFotoId = null;
+let editingFotoCard = null;
+let editingFotoUrl = null;
 const fotoMsg = document.getElementById('fotoMsg');
-const galleryGridEl = document.querySelector('.gallery-grid');
 
 // escape teks user biar aman dimasukkan lewat innerHTML
 function escapeHtml(str) {
@@ -657,24 +702,33 @@ function buatPhotoCard(item) {
     const div = document.createElement('div');
     div.className = 'photo-card';
     div.dataset.category = item.kategori;
+
+    // foto yang datang dari database punya id -> bisa diedit/dihapus
+    // foto statis (ditulis langsung di HTML) gak punya id -> gak dikasih tombol admin
+    if (item.id) {
+        div.dataset.photoId = item.id;
+        div.dataset.caption = item.caption;
+        div.dataset.kategori = item.kategori;
+        div.dataset.url = item.url;
+    }
+
     div.innerHTML = `
         <img src="${item.url}" alt="${escapeHtml(item.caption)}" style="width:100%; height:100%; object-fit:cover;">
         <div class="photo-caption">${escapeHtml(item.caption)}</div>
+        ${item.id ? `
+        <div class="photo-admin-actions">
+          <button type="button" class="photo-edit-btn" title="Edit foto" aria-label="Edit foto">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+          <button type="button" class="photo-delete-btn" title="Hapus foto" aria-label="Hapus foto">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>` : ''}
     `;
     return div;
 }
 
-function buatGalleryCard(item) {
-    const div = document.createElement('div');
-    div.className = 'gallery-card';
-    div.innerHTML = `
-        <img src="${item.url}" alt="${escapeHtml(item.caption)}" style="width:100%; height:100%; object-fit:cover;">
-        <div class="gallery-overlay"><span class="tag">${escapeHtml(item.kategori)}</span><span class="caption">${escapeHtml(item.caption)}</span></div>
-    `;
-    return div;
-}
-
-// tempel 1 foto baru di paling atas kedua grid, langsung ikut filter aktif
+// tempel 1 foto baru di paling atas quickGrid aja (bagian atas galeri kenangan), langsung ikut filter aktif
 function tempelFotoBaru(item) {
     if (quickGrid) {
         const card = buatPhotoCard(item);
@@ -688,14 +742,11 @@ function tempelFotoBaru(item) {
             emptyState.hidden = adaYangKeliatan;
         }
     }
-    if (galleryGridEl) {
-        galleryGridEl.prepend(buatGalleryCard(item));
-    }
 }
 
 // ambil semua foto yang pernah diupload, taruh di atas foto statis yang lama
 async function muatGaleriFoto() {
-    if (!quickGrid && !galleryGridEl) return; // bukan halaman beranda, skip
+    if (!quickGrid) return; // bukan halaman beranda, skip
 
     const { data, error } = await supabaseClient
         .from('galeri_foto')
@@ -716,6 +767,16 @@ document.addEventListener('DOMContentLoaded', muatGaleriFoto);
 if (btnTambahFoto) {
     btnTambahFoto.addEventListener('click', () => {
         if (!isAdmin) return; // jaga-jaga
+
+        // pastikan modal dalam mode "tambah baru", bukan nyangkut dari mode edit
+        editingFotoId = null;
+        editingFotoCard = null;
+        editingFotoUrl = null;
+        if (modalFotoTitle) modalFotoTitle.textContent = 'Tambah Foto ke Galeri';
+        if (btnUnggahFoto) btnUnggahFoto.textContent = 'Unggah Foto';
+        if (inputFotoFile) inputFotoFile.required = true;
+        formFoto?.reset();
+
         if (fotoMsg) fotoMsg.textContent = '';
         if (modalFoto) modalFoto.style.display = 'flex';
     });
@@ -731,21 +792,85 @@ window.addEventListener('click', (e) => {
     if (e.target === modalFoto) modalFoto.style.display = 'none';
 });
 
-// submit form upload: kirim file ke Storage, lalu simpan metadatanya ke tabel
+// buka modal dalam mode EDIT, isi form dengan data foto yang mau diubah
+function bukaEditFoto(photoId, card) {
+    editingFotoId = photoId;
+    editingFotoCard = card;
+    editingFotoUrl = card.dataset.url || '';
+
+    if (modalFotoTitle) modalFotoTitle.textContent = 'Edit Foto';
+    if (btnUnggahFoto) btnUnggahFoto.textContent = 'Simpan Perubahan';
+    if (inputFotoCaption) inputFotoCaption.value = card.dataset.caption || '';
+    if (inputFotoKategori) inputFotoKategori.value = card.dataset.kategori || 'Foto';
+    if (inputFotoFile) {
+        inputFotoFile.required = false; // ganti file itu opsional pas edit
+        inputFotoFile.value = '';
+    }
+    if (fotoMsg) fotoMsg.textContent = '';
+    if (modalFoto) modalFoto.style.display = 'flex';
+}
+
+// hapus foto dari storage + tabel, lalu hilangin card-nya dari tampilan
+async function hapusFoto(photoId, card) {
+    const yakin = confirm('Yakin mau hapus foto ini? Foto yang udah dihapus gak bisa dikembalikan.');
+    if (!yakin) return;
+
+    const url = card.dataset.url || '';
+    const namaFile = url.split('/galeri/').pop();
+
+    if (namaFile) {
+        await supabaseClient.storage.from('galeri').remove([namaFile]);
+    }
+
+    const { error } = await supabaseClient.from('galeri_foto').delete().eq('id', photoId);
+
+    if (error) {
+        alert('Gagal menghapus foto: ' + error.message);
+        return;
+    }
+
+    card.remove();
+
+    if (emptyState && quickGrid) {
+        const adaYangKeliatan = [...quickGrid.querySelectorAll('.photo-card')].some(c => c.style.display !== 'none');
+        emptyState.hidden = adaYangKeliatan;
+    }
+}
+
+// klik tombol edit/hapus di dalam kartu foto (delegasi event, biar foto baru ikut ke-handle juga)
+if (quickGrid) {
+    quickGrid.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.photo-edit-btn');
+        const delBtn = e.target.closest('.photo-delete-btn');
+        if (!editBtn && !delBtn) return;
+
+        if (!isAdmin) return; // jaga-jaga
+
+        const card = e.target.closest('.photo-card');
+        const photoId = card?.dataset.photoId;
+        if (!card || !photoId) return; // foto statis, gak ada di database, gak bisa diedit/dihapus
+
+        if (editBtn) bukaEditFoto(photoId, card);
+        if (delBtn) hapusFoto(photoId, card);
+    });
+}
+
+// submit form: kalau lagi mode edit -> update data lama, kalau enggak -> upload foto baru
 if (formFoto) {
     formFoto.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         if (!currentUser || !isAdmin) {
-            alert('Hanya admin yang bisa menambah foto.');
+            alert('Hanya admin yang bisa menambah/mengubah foto.');
             return;
         }
 
         const file = inputFotoFile.files[0];
         const caption = inputFotoCaption.value.trim();
         const kategori = inputFotoKategori.value;
+        const modeEdit = !!editingFotoId;
 
-        if (!file) {
+        if (!modeEdit && !file) {
             fotoMsg.textContent = 'Pilih file foto dulu.';
             return;
         }
@@ -755,39 +880,83 @@ if (formFoto) {
         }
 
         fotoMsg.style.color = '#666';
-        fotoMsg.textContent = 'Mengunggah foto...';
+        fotoMsg.textContent = modeEdit ? 'Menyimpan perubahan...' : 'Mengunggah foto...';
 
-        const ext = file.name.split('.').pop();
-        const namaFile = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        // url foto: pakai yang lama kalau edit & gak ganti file, upload baru kalau ada file
+        let publicUrl = modeEdit ? editingFotoUrl : null;
 
-        const { error: uploadError } = await supabaseClient.storage
-            .from('galeri')
-            .upload(namaFile, file);
+        if (file) {
+            const ext = file.name.split('.').pop();
+            const namaFile = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-        if (uploadError) {
-            fotoMsg.style.color = '#c0392b';
-            fotoMsg.textContent = 'Gagal upload file: ' + uploadError.message;
-            return;
+            const { error: uploadError } = await supabaseClient.storage
+                .from('galeri')
+                .upload(namaFile, file);
+
+            if (uploadError) {
+                fotoMsg.style.color = '#c0392b';
+                fotoMsg.textContent = 'Gagal upload file: ' + uploadError.message;
+                return;
+            }
+
+            const { data: urlData } = supabaseClient.storage.from('galeri').getPublicUrl(namaFile);
+            publicUrl = urlData.publicUrl;
         }
 
-        const { data: urlData } = supabaseClient.storage.from('galeri').getPublicUrl(namaFile);
-        const publicUrl = urlData.publicUrl;
+        if (modeEdit) {
+            // -- UPDATE FOTO YANG SUDAH ADA --
+            const { error: updateError } = await supabaseClient
+                .from('galeri_foto')
+                .update({ url: publicUrl, caption, kategori })
+                .eq('id', editingFotoId);
 
-        const itemBaru = { url: publicUrl, caption, kategori, uploaded_by: currentUser.id };
+            if (updateError) {
+                fotoMsg.style.color = '#c0392b';
+                fotoMsg.textContent = 'Gagal menyimpan perubahan: ' + updateError.message;
+                return;
+            }
 
-        const { error: insertError } = await supabaseClient.from('galeri_foto').insert([itemBaru]);
+            // update tampilan card yang lagi kebuka tanpa perlu reload halaman
+            if (editingFotoCard) {
+                editingFotoCard.dataset.category = kategori;
+                editingFotoCard.dataset.caption = caption;
+                editingFotoCard.dataset.kategori = kategori;
+                editingFotoCard.dataset.url = publicUrl;
+                const img = editingFotoCard.querySelector('img');
+                if (img) { img.src = publicUrl; img.alt = caption; }
+                const capEl = editingFotoCard.querySelector('.photo-caption');
+                if (capEl) capEl.textContent = caption;
+            }
 
-        if (insertError) {
-            fotoMsg.style.color = '#c0392b';
-            fotoMsg.textContent = 'Foto keupload, tapi gagal disimpan: ' + insertError.message;
-            return;
+            formFoto.reset();
+            fotoMsg.textContent = '';
+            if (modalFoto) modalFoto.style.display = 'none';
+            editingFotoId = null;
+            editingFotoCard = null;
+            editingFotoUrl = null;
+            alert('Perubahan foto berhasil disimpan!');
+        } else {
+            // -- TAMBAH FOTO BARU --
+            const itemBaru = { url: publicUrl, caption, kategori, uploaded_by: currentUser.id };
+
+            const { data: inserted, error: insertError } = await supabaseClient
+                .from('galeri_foto')
+                .insert([itemBaru])
+                .select()
+                .single();
+
+            if (insertError) {
+                fotoMsg.style.color = '#c0392b';
+                fotoMsg.textContent = 'Foto keupload, tapi gagal disimpan: ' + insertError.message;
+                return;
+            }
+
+            tempelFotoBaru(inserted || itemBaru);
+            formFoto.reset();
+            fotoMsg.textContent = '';
+            if (modalFoto) modalFoto.style.display = 'none';
+            alert('Foto berhasil ditambahkan ke galeri!');
         }
-
-        tempelFotoBaru(itemBaru); // langsung tampil tanpa perlu reload
-        formFoto.reset();
-        fotoMsg.textContent = '';
-        if (modalFoto) modalFoto.style.display = 'none';
-        alert('Foto berhasil ditambahkan ke galeri!');
     });
 }
 
@@ -841,6 +1010,7 @@ function closeVideoModal() {
 
 if (videoGrid && videoModal) {
   videoGrid.addEventListener('click', (e) => {
+    if (e.target.closest('.card-admin-actions')) return; // klik tombol admin, jangan buka player video
     const card = e.target.closest('.video-card');
     if (!card) return;
     openVideoModal(card.dataset.title, card.dataset.src);
@@ -855,4 +1025,507 @@ if (videoGrid && videoModal) {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeVideoModal();
   });
+}
+
+/* ==========================================================
+   VIDEO MOMEN — CRUD penuh khusus admin (tambah/edit/hapus dari HP)
+   ========================================================== */
+const btnTutupVideoForm = document.getElementById('btnTutupVideoForm');
+const formVideo = document.getElementById('form-video');
+const inputVideoFile = document.getElementById('input-video-file');
+const inputVideoJudul = document.getElementById('input-video-judul');
+const inputVideoDurasi = document.getElementById('input-video-durasi');
+const videoFormMsg = document.getElementById('videoFormMsg');
+const modalVideoForm = document.getElementById('modalVideoForm');
+const modalVideoFormTitle = document.getElementById('modalVideoFormTitle');
+const btnSimpanVideo = document.getElementById('btnSimpanVideo');
+
+let editingVideoId = null;
+let editingVideoCard = null;
+let editingVideoUrl = null;
+
+function buatVideoCard(item) {
+    const div = document.createElement('div');
+    div.className = 'video-card';
+    div.dataset.title = item.judul;
+    div.dataset.duration = item.durasi || '';
+    div.dataset.src = item.video_url;
+
+    if (item.id) {
+        div.dataset.videoId = item.id;
+        div.dataset.judul = item.judul;
+        div.dataset.durasi = item.durasi || '';
+        div.dataset.url = item.video_url;
+    }
+
+    div.innerHTML = `
+        <span class="play-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </span>
+        <div class="video-info">
+          <p class="video-title">${escapeHtml(item.judul)}</p>
+          <span class="video-duration">${escapeHtml(item.durasi || '')}</span>
+        </div>
+        ${item.id ? `
+        <div class="card-admin-actions">
+          <button type="button" class="photo-edit-btn video-edit-btn" title="Edit video" aria-label="Edit video">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+          <button type="button" class="photo-delete-btn video-delete-btn" title="Hapus video" aria-label="Hapus video">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>` : ''}
+    `;
+    return div;
+}
+
+async function muatVideo() {
+    if (!videoGrid) return; // bukan halaman beranda, skip
+
+    const { data, error } = await supabaseClient
+        .from('videos')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        console.error('Gagal memuat video:', error.message);
+        return;
+    }
+
+    videoGrid.innerHTML = '';
+    data.forEach((item) => videoGrid.appendChild(buatVideoCard(item)));
+}
+
+document.addEventListener('DOMContentLoaded', muatVideo);
+
+function resetFormVideo() {
+    editingVideoId = null;
+    editingVideoCard = null;
+    editingVideoUrl = null;
+    if (modalVideoFormTitle) modalVideoFormTitle.textContent = 'Tambah Video';
+    if (btnSimpanVideo) btnSimpanVideo.textContent = 'Simpan Video';
+    if (inputVideoFile) inputVideoFile.required = true;
+    formVideo?.reset();
+    if (videoFormMsg) videoFormMsg.textContent = '';
+}
+
+if (btnTambahVideo) {
+    btnTambahVideo.addEventListener('click', () => {
+        if (!isAdmin) return;
+        resetFormVideo();
+        if (modalVideoForm) modalVideoForm.style.display = 'flex';
+    });
+}
+
+if (btnTutupVideoForm) {
+    btnTutupVideoForm.addEventListener('click', () => {
+        if (modalVideoForm) modalVideoForm.style.display = 'none';
+    });
+}
+
+window.addEventListener('click', (e) => {
+    if (e.target === modalVideoForm) modalVideoForm.style.display = 'none';
+});
+
+function bukaEditVideo(videoId, card) {
+    editingVideoId = videoId;
+    editingVideoCard = card;
+    editingVideoUrl = card.dataset.url || '';
+
+    if (modalVideoFormTitle) modalVideoFormTitle.textContent = 'Edit Video';
+    if (btnSimpanVideo) btnSimpanVideo.textContent = 'Simpan Perubahan';
+    if (inputVideoJudul) inputVideoJudul.value = card.dataset.judul || '';
+    if (inputVideoDurasi) inputVideoDurasi.value = card.dataset.durasi || '';
+    if (inputVideoFile) {
+        inputVideoFile.required = false; // ganti file video itu opsional pas edit
+        inputVideoFile.value = '';
+    }
+    if (videoFormMsg) videoFormMsg.textContent = '';
+    if (modalVideoForm) modalVideoForm.style.display = 'flex';
+}
+
+async function hapusVideo(videoId, card) {
+    const yakin = confirm('Yakin mau hapus video ini? Tindakan ini gak bisa dibatalin.');
+    if (!yakin) return;
+
+    const url = card.dataset.url || '';
+    const namaFile = url.split('/galeri/').pop();
+    if (namaFile && !url.startsWith('assets/')) {
+        await supabaseClient.storage.from('galeri').remove([namaFile]);
+    }
+
+    const { error } = await supabaseClient.from('videos').delete().eq('id', videoId);
+
+    if (error) {
+        alert('Gagal menghapus video: ' + error.message);
+        return;
+    }
+
+    card.remove();
+}
+
+if (videoGrid) {
+    videoGrid.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.video-edit-btn');
+        const delBtn = e.target.closest('.video-delete-btn');
+        if (!editBtn && !delBtn) return;
+
+        if (!isAdmin) return;
+
+        const card = e.target.closest('.video-card');
+        const videoId = card?.dataset.videoId;
+        if (!card || !videoId) return; // video statis lama, gak ada di database
+
+        if (editBtn) bukaEditVideo(videoId, card);
+        if (delBtn) hapusVideo(videoId, card);
+    });
+}
+
+if (formVideo) {
+    formVideo.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!currentUser || !isAdmin) {
+            alert('Hanya admin yang bisa menambah/mengubah video.');
+            return;
+        }
+
+        const file = inputVideoFile.files[0];
+        const judul = inputVideoJudul.value.trim();
+        const durasi = inputVideoDurasi.value.trim();
+        const modeEdit = !!editingVideoId;
+
+        if (!modeEdit && !file) {
+            videoFormMsg.textContent = 'Pilih file video dulu.';
+            return;
+        }
+        if (!judul) {
+            videoFormMsg.textContent = 'Judul video tidak boleh kosong.';
+            return;
+        }
+
+        videoFormMsg.style.color = '#666';
+        videoFormMsg.textContent = modeEdit ? 'Menyimpan perubahan...' : 'Mengunggah video...';
+
+        let publicUrl = modeEdit ? editingVideoUrl : null;
+
+        if (file) {
+            const ext = file.name.split('.').pop();
+            const namaFile = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+            const { error: uploadError } = await supabaseClient.storage
+                .from('galeri')
+                .upload(namaFile, file);
+
+            if (uploadError) {
+                videoFormMsg.style.color = '#c0392b';
+                videoFormMsg.textContent = 'Gagal upload file: ' + uploadError.message;
+                return;
+            }
+
+            const { data: urlData } = supabaseClient.storage.from('galeri').getPublicUrl(namaFile);
+            publicUrl = urlData.publicUrl;
+        }
+
+        if (modeEdit) {
+            const { error: updateError } = await supabaseClient
+                .from('videos')
+                .update({ judul, durasi, video_url: publicUrl })
+                .eq('id', editingVideoId);
+
+            if (updateError) {
+                videoFormMsg.style.color = '#c0392b';
+                videoFormMsg.textContent = 'Gagal menyimpan perubahan: ' + updateError.message;
+                return;
+            }
+
+            if (editingVideoCard) {
+                editingVideoCard.dataset.title = judul;
+                editingVideoCard.dataset.duration = durasi;
+                editingVideoCard.dataset.src = publicUrl;
+                editingVideoCard.dataset.judul = judul;
+                editingVideoCard.dataset.durasi = durasi;
+                editingVideoCard.dataset.url = publicUrl;
+                const titleEl = editingVideoCard.querySelector('.video-title');
+                if (titleEl) titleEl.textContent = judul;
+                const durasiEl = editingVideoCard.querySelector('.video-duration');
+                if (durasiEl) durasiEl.textContent = durasi;
+            }
+
+            if (modalVideoForm) modalVideoForm.style.display = 'none';
+            alert('Perubahan video berhasil disimpan!');
+        } else {
+            const itemBaru = { judul, durasi, video_url: publicUrl };
+
+            const { data: inserted, error: insertError } = await supabaseClient
+                .from('videos')
+                .insert([itemBaru])
+                .select()
+                .single();
+
+            if (insertError) {
+                videoFormMsg.style.color = '#c0392b';
+                videoFormMsg.textContent = 'Video keupload, tapi gagal disimpan: ' + insertError.message;
+                return;
+            }
+
+            videoGrid.appendChild(buatVideoCard(inserted || itemBaru));
+            if (modalVideoForm) modalVideoForm.style.display = 'none';
+            alert('Video berhasil ditambahkan!');
+        }
+
+        resetFormVideo();
+    });
+}
+
+/* ==========================================================
+   MEMBER / PROFIL TEMAN — CRUD penuh khusus admin (tambah/edit/hapus dari HP)
+   ========================================================== */
+const memberGrid = document.getElementById('memberGrid');
+const modalMember = document.getElementById('modalMember');
+const modalMemberTitle = document.getElementById('modalMemberTitle');
+const btnTutupMember = document.getElementById('btnTutupMember');
+const formMember = document.getElementById('form-member');
+const inputMemberAvatar = document.getElementById('input-member-avatar');
+const inputMemberNama = document.getElementById('input-member-nama');
+const inputMemberUsername = document.getElementById('input-member-username');
+const inputMemberQuote = document.getElementById('input-member-quote');
+const memberMsg = document.getElementById('memberMsg');
+const btnSimpanMember = document.getElementById('btnSimpanMember');
+
+let editingMemberId = null;
+let editingMemberCard = null;
+let editingMemberAvatarUrl = null;
+
+function buatMemberCard(item) {
+    const div = document.createElement('div');
+    div.className = 'profile-card';
+
+    if (item.id) {
+        div.dataset.memberId = item.id;
+        div.dataset.nama = item.nama;
+        div.dataset.username = item.username || '';
+        div.dataset.quote = item.quote || '';
+        div.dataset.avatarUrl = item.avatar_url || '';
+    }
+
+    div.innerHTML = `
+        <div class="profile-avatar"><img src="${item.avatar_url || ''}" alt="${escapeHtml(item.nama)}"></div>
+        <p class="profile-name">${escapeHtml(item.nama)}</p>
+        <p class="profile-class">${escapeHtml(item.username || '')}</p>
+        <p class="profile-quote">"${escapeHtml(item.quote || '')}"</p>
+        ${item.id ? `
+        <div class="card-admin-actions">
+          <button type="button" class="photo-edit-btn member-edit-btn" title="Edit member" aria-label="Edit member">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+          <button type="button" class="photo-delete-btn member-delete-btn" title="Hapus member" aria-label="Hapus member">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>` : ''}
+    `;
+    return div;
+}
+
+async function muatMember() {
+    if (!memberGrid) return; // bukan halaman member, skip
+
+    const { data, error } = await supabaseClient
+        .from('members')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        console.error('Gagal memuat member:', error.message);
+        return;
+    }
+
+    memberGrid.innerHTML = '';
+    data.forEach((item) => memberGrid.appendChild(buatMemberCard(item)));
+}
+
+document.addEventListener('DOMContentLoaded', muatMember);
+
+function resetFormMember() {
+    editingMemberId = null;
+    editingMemberCard = null;
+    editingMemberAvatarUrl = null;
+    if (modalMemberTitle) modalMemberTitle.textContent = 'Tambah Member';
+    if (btnSimpanMember) btnSimpanMember.textContent = 'Simpan Member';
+    if (inputMemberAvatar) inputMemberAvatar.required = true;
+    formMember?.reset();
+    if (memberMsg) memberMsg.textContent = '';
+}
+
+if (btnTambahMember) {
+    btnTambahMember.addEventListener('click', () => {
+        if (!isAdmin) return;
+        resetFormMember();
+        if (modalMember) modalMember.style.display = 'flex';
+    });
+}
+
+if (btnTutupMember) {
+    btnTutupMember.addEventListener('click', () => {
+        if (modalMember) modalMember.style.display = 'none';
+    });
+}
+
+window.addEventListener('click', (e) => {
+    if (e.target === modalMember) modalMember.style.display = 'none';
+});
+
+function bukaEditMember(memberId, card) {
+    editingMemberId = memberId;
+    editingMemberCard = card;
+    editingMemberAvatarUrl = card.dataset.avatarUrl || '';
+
+    if (modalMemberTitle) modalMemberTitle.textContent = 'Edit Member';
+    if (btnSimpanMember) btnSimpanMember.textContent = 'Simpan Perubahan';
+    if (inputMemberNama) inputMemberNama.value = card.dataset.nama || '';
+    if (inputMemberUsername) inputMemberUsername.value = card.dataset.username || '';
+    if (inputMemberQuote) inputMemberQuote.value = card.dataset.quote || '';
+    if (inputMemberAvatar) {
+        inputMemberAvatar.required = false; // ganti foto itu opsional pas edit
+        inputMemberAvatar.value = '';
+    }
+    if (memberMsg) memberMsg.textContent = '';
+    if (modalMember) modalMember.style.display = 'flex';
+}
+
+async function hapusMember(memberId, card) {
+    const yakin = confirm('Yakin mau hapus member ini?');
+    if (!yakin) return;
+
+    const url = card.dataset.avatarUrl || '';
+    if (url.includes('/galeri/')) {
+        const namaFile = url.split('/galeri/').pop();
+        if (namaFile) await supabaseClient.storage.from('galeri').remove([namaFile]);
+    }
+
+    const { error } = await supabaseClient.from('members').delete().eq('id', memberId);
+
+    if (error) {
+        alert('Gagal menghapus member: ' + error.message);
+        return;
+    }
+
+    card.remove();
+}
+
+if (memberGrid) {
+    memberGrid.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.member-edit-btn');
+        const delBtn = e.target.closest('.member-delete-btn');
+        if (!editBtn && !delBtn) return;
+
+        if (!isAdmin) return;
+
+        const card = e.target.closest('.profile-card');
+        const memberId = card?.dataset.memberId;
+        if (!card || !memberId) return; // member statis lama, gak ada di database
+
+        if (editBtn) bukaEditMember(memberId, card);
+        if (delBtn) hapusMember(memberId, card);
+    });
+}
+
+if (formMember) {
+    formMember.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!currentUser || !isAdmin) {
+            alert('Hanya admin yang bisa menambah/mengubah member.');
+            return;
+        }
+
+        const file = inputMemberAvatar.files[0];
+        const nama = inputMemberNama.value.trim();
+        const username = inputMemberUsername.value.trim();
+        const quote = inputMemberQuote.value.trim();
+        const modeEdit = !!editingMemberId;
+
+        if (!modeEdit && !file) {
+            memberMsg.textContent = 'Pilih foto profil dulu.';
+            return;
+        }
+        if (!nama) {
+            memberMsg.textContent = 'Nama tidak boleh kosong.';
+            return;
+        }
+
+        memberMsg.style.color = '#666';
+        memberMsg.textContent = modeEdit ? 'Menyimpan perubahan...' : 'Menambah member...';
+
+        let avatarUrl = modeEdit ? editingMemberAvatarUrl : null;
+
+        if (file) {
+            const ext = file.name.split('.').pop();
+            const namaFile = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+            const { error: uploadError } = await supabaseClient.storage
+                .from('galeri')
+                .upload(namaFile, file);
+
+            if (uploadError) {
+                memberMsg.style.color = '#c0392b';
+                memberMsg.textContent = 'Gagal upload foto: ' + uploadError.message;
+                return;
+            }
+
+            const { data: urlData } = supabaseClient.storage.from('galeri').getPublicUrl(namaFile);
+            avatarUrl = urlData.publicUrl;
+        }
+
+        if (modeEdit) {
+            const { error: updateError } = await supabaseClient
+                .from('members')
+                .update({ nama, username, quote, avatar_url: avatarUrl })
+                .eq('id', editingMemberId);
+
+            if (updateError) {
+                memberMsg.style.color = '#c0392b';
+                memberMsg.textContent = 'Gagal menyimpan perubahan: ' + updateError.message;
+                return;
+            }
+
+            if (editingMemberCard) {
+                editingMemberCard.dataset.nama = nama;
+                editingMemberCard.dataset.username = username;
+                editingMemberCard.dataset.quote = quote;
+                editingMemberCard.dataset.avatarUrl = avatarUrl;
+                const img = editingMemberCard.querySelector('.profile-avatar img');
+                if (img) img.src = avatarUrl;
+                const namaEl = editingMemberCard.querySelector('.profile-name');
+                if (namaEl) namaEl.textContent = nama;
+                const usernameEl = editingMemberCard.querySelector('.profile-class');
+                if (usernameEl) usernameEl.textContent = username;
+                const quoteEl = editingMemberCard.querySelector('.profile-quote');
+                if (quoteEl) quoteEl.textContent = `"${quote}"`;
+            }
+
+            if (modalMember) modalMember.style.display = 'none';
+            alert('Perubahan member berhasil disimpan!');
+        } else {
+            const itemBaru = { nama, username, quote, avatar_url: avatarUrl };
+
+            const { data: inserted, error: insertError } = await supabaseClient
+                .from('members')
+                .insert([itemBaru])
+                .select()
+                .single();
+
+            if (insertError) {
+                memberMsg.style.color = '#c0392b';
+                memberMsg.textContent = 'Gagal menyimpan member: ' + insertError.message;
+                return;
+            }
+
+            memberGrid.appendChild(buatMemberCard(inserted || itemBaru));
+            if (modalMember) modalMember.style.display = 'none';
+            alert('Member berhasil ditambahkan!');
+        }
+
+        resetFormMember();
+    });
 }
