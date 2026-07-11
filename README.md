@@ -1,7 +1,7 @@
 # 🌲 d.bruuh — Website Kenang-Kenangan
 
 <p align="center">
-  <img src="assets/logo.png" alt="d.bruuh logo" width="220" />
+  <img src="site/assets/logo.png" alt="d.bruuh logo" width="220" />
 </p>
 
 <p align="center">
@@ -9,10 +9,12 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/status-live-2D5A4A?style=flat-square" />
-  <img src="https://img.shields.io/badge/HTML-CSS-JS-2D5A4A?style=flat-square" />
-  <img src="https://img.shields.io/badge/backend-Supabase-3ECF8E?style=flat-square" />
-  <img src="https://img.shields.io/badge/made%20with-%E2%98%95%EF%B8%8F%20%26%20nostalgia-6F4E37?style=flat-square" />
+  <img src="https://img.shields.io/badge/status-live-2D5A4A?style=flat-square" alt="status live" />
+  <img src="https://img.shields.io/badge/HTML5-E07A5F?style=flat-square" alt="HTML5" />
+  <img src="https://img.shields.io/badge/CSS3-6F4E37?style=flat-square" alt="CSS3" />
+  <img src="https://img.shields.io/badge/JavaScript-2D5A4A?style=flat-square" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/backend-Supabase-3ECF8E?style=flat-square" alt="backend Supabase" />
+  <img src="https://img.shields.io/badge/made%20with-%E2%98%95%EF%B8%8F%20%26%20nostalgia-6F4E37?style=flat-square" alt="made with coffee and nostalgia" />
 </p>
 
 ---
@@ -23,14 +25,12 @@ Tiga tahun itu gak lama, tapi juga gak sebentar untuk dilupain begitu saja.
 
 `d.bruuh` adalah Website yang dibuat karena satu hal kecil yang mungkin terdengar sepele, takut lupa. Foto, video, dan semua kenangan yang tersebar di aplikasi seperti WhatsApp, Instagram, ataupun galeri pribadi masing-masing bisa saja terhapus karena alasan seperti tidak sengaja terhapus atau memori penyimpanan yang penuh. Jadi, website ini ada untuk menjadi tempat khusus untuk menyimpan foto atau video yang pernah tertangkap oleh kamera. Website ini akan menjadi rumah untuk semua kenangan yang terekam dan rumah ini tak akan tertimbun oleh waktu.
 
-## ✨ Fitur
-
 | Fitur | Deskripsi |
 |---|---|
 | 🏠 **Beranda** | Hero slider, filter kategori cepat, dan preview konten |
 | 🖼️ **Galeri** | Foto kenangan tersimpan di Supabase, bisa difilter per kategori, upload/edit/hapus khusus admin |
-| 🎬 **Video** | Rekap video dengan player modal inline, CRUD khusus admin |
-| 👥 **Profil Teman (Member)** | Kartu profil tiap member bruh, dikelola admin |
+| 🎬 **Video** | Rekap video dengan player modal inline + thumbnail auto-generate dari frame video, CRUD khusus admin |
+| 👥 **Profil Teman (Member)** | Kartu profil tiap orang di angkatan, dikelola admin |
 | 💌 **Pesan & Kesan** | Dinding pesan perpisahan dari siapa aja yang login, bisa dikirim atas nama sendiri atau Anonim |
 | ⭐ **Rating Website** | User login bisa kasih rating 1–5 bintang, rata-rata ditampilkan real-time |
 | 🔐 **Login & Daftar** | Autentikasi lewat Supabase Auth (email + password) |
@@ -55,57 +55,63 @@ Hangat, alami, dan nyaman. Cocok buat tema adventure, ngopi, dan kebersamaan.
 
 - **Frontend:** HTML5, CSS3 (custom properties, no framework), Vanilla JavaScript
 - **Backend:** [Supabase](https://supabase.com) — Auth, Postgres Database, Storage, dan Row Level Security (RLS)
-
+- **Hosting:** Cloudflare Pages
 
 ## 📂 Struktur Project
 
 ```
-d-bruuh/
-├── index.html            # Beranda (hero, galeri, video preview)
-├── profil-teman.html     # Halaman Member
-├── pesan-kesan.html      # Dinding pesan & kesan + rating
-├── tentang.html          # Cerita di balik website ini
-├── style.css              # Semua styling
-├── script.js               # Auth, CRUD Supabase, interaktivitas (modal, filter, dll)
-├── assets/
-│   └── logo.png
-└── supabase/
-    ├── setup-galeri-foto.sql       # Tabel admins + galeri_foto + storage bucket
-    ├── migration_admin_full.sql    # Tabel members, videos + policy admin
-    ├── setup-supabase.sql          # RLS pesan_kesan
-    ├── setup-supabase-rating.sql   # Tabel ratings
-    └── alter-ratings-add-nama.sql  # Kolom nama di ratings
+Project_d.bruuh/
+├── site/                  # Semua file yang di-deploy ke publik
+│   ├── index.html
+│   ├── profil-teman.html
+│   ├── pesan-kesan.html
+│   ├── tentang.html
+│   ├── style.css
+│   ├── script.js
+│   └── assets/
+│       ├── logo.png
+│       └── videos/
+├── sql/                    # Migration & RLS policy Supabase (gak ikut deploy)
+│   ├── setup-galeri-foto.sql
+│   ├── migration_admin_full.sql
+│   ├── setup-supabase.sql
+│   ├── setup-supabase-rating.sql
+│   ├── alter-ratings-add-nama.sql
+│   ├── fix-galeri-foto-update.sql
+│   └── add-video-thumbnail.sql
+└── README.md
 ```
 
 ## 🗄️ Setup Supabase
 
-Website ini butuh project Supabase sendiri buat jalan penuh (auth, database, storage).
-
 1. Buat project baru di [supabase.com](https://supabase.com)
-2. Buka **SQL Editor**, jalankan file-file di folder `supabase/` **secara berurutan**:
+2. Buka **SQL Editor**, jalankan file-file di folder `sql/` **secara berurutan**:
    1. `setup-galeri-foto.sql`
    2. `migration_admin_full.sql`
    3. `setup-supabase.sql`
    4. `setup-supabase-rating.sql`
    5. `alter-ratings-add-nama.sql`
-3. Tambahkan URL & anon key project ke `script.js` (bagian `createClient(...)`)
-4. Buat akun admin pertama secara manual: daftar lewat form Daftar di web, lalu insert `user_id` akunnya ke tabel `admins` lewat SQL Editor:
+   6. `fix-galeri-foto-update.sql`
+   7. `add-video-thumbnail.sql`
+3. Tambahkan URL & anon key project ke `site/script.js` (bagian `createClient(...)`)
+4. Buat akun admin pertama secara manual: daftar lewat form Daftar di web, lalu insert `user_id` akunnya ke tabel `admins`:
    ```sql
    insert into public.admins (user_id) values ('uuid-user-kamu');
    ```
+5. Di **Authentication → URL Configuration**, tambahin URL domain deploy kamu ke **Site URL** dan **Redirect URLs**
 
 > Semua tabel sudah pakai Row Level Security — publik cuma bisa baca, insert/update/delete dibatasi ke pemilik data atau akun admin.
 
-## 🚀 Cara Menjalankan
+## 🚀 Cara Menjalankan Lokal
 
 1. Clone repo ini
    ```bash
    git clone https://github.com/Hawkeye7221RZ/Project_d.bruuh.git
-   cd Project_d.bruuh
+   cd Project_d.bruuh/site
    ```
 2. Selesaikan [Setup Supabase](#️-setup-supabase) di atas
 3. Buka `index.html` langsung di browser, **atau** pakai Live Server (disarankan):
-   - Buka folder ini di VSCode
+   - Buka folder `site/` ini di VSCode
    - Install extension **Live Server**
    - Klik kanan `index.html` → **Open with Live Server**
 
@@ -116,12 +122,12 @@ Website ini butuh project Supabase sendiri buat jalan penuh (auth, database, sto
 - [x] Halaman Beranda, Galeri, Video
 - [x] Halaman Profil Teman & Pesan Kesan
 - [x] Halaman Tentang
-- [x] Setup Supabase (auth + database + storage)
+- [x] Setup Supabase (auth + database + storage + RLS)
 - [x] Sistem login & daftar akun
 - [x] CRUD admin untuk member, video, dan foto galeri
 - [x] Rating & pesan kesan dari user login
+- [x] Deploy ke hosting publik (Cloudflare)
 - [ ] Edit nama tampilan / mode Anonim permanen buat user
-- [ ] Deploy ke hosting publik (Vercel/Netlify)
 
 ## 🤝 Kontribusi
 
