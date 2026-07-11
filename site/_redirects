@@ -1,0 +1,7 @@
+# Blokir akses publik ke file-file yang gak perlu keliatan orang lain.
+# Filenya tetep ada di deploy, tapi Netlify bakal balikin 404 kalau diakses langsung.
+
+/sql/*      /404.html   404
+/*.sql      /404.html   404
+/readme.md  /404.html   404
+/README.md  /404.html   404
