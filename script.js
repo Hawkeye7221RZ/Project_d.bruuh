@@ -494,8 +494,8 @@ async function muatPesan() {
         card.className = 'message-card'; // Sesuaikan dengan nama class CSS kartu pesan Anda
         card.dataset.pesanId = item.id;
         card.innerHTML = `
-            <p class="pesan-nama"><strong>Pengirim:</strong> ${item.nama}</p>
-            <p class="pesan-isi"><strong>Pesan:</strong> ${item.pesan}</p>
+            <p class="pesan-nama"><strong>Pengirim:</strong> ${escapeHtml(item.nama)}</p>
+            <p class="pesan-isi"><strong>Pesan:</strong> ${escapeHtml(item.pesan)}</p>
             <div class="pesan-admin-row">
               <button type="button" class="pesan-delete-btn" title="Hapus pesan ini">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
@@ -696,6 +696,48 @@ function escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str ?? '';
     return div.innerHTML;
+}
+
+// Ambil 1 frame dari file video (pakai <video> tersembunyi + canvas), balikin sebagai Blob JPEG.
+// Dipakai buat bikin thumbnail otomatis pas admin upload video baru.
+function buatThumbnailDariVideo(file) {
+    return new Promise((resolve, reject) => {
+        const videoEl = document.createElement('video');
+        videoEl.preload = 'metadata';
+        videoEl.muted = true;
+        videoEl.playsInline = true;
+        videoEl.src = URL.createObjectURL(file);
+
+        const bersihkan = () => URL.revokeObjectURL(videoEl.src);
+
+        videoEl.addEventListener('loadedmetadata', () => {
+            // ambil frame di detik ke-1, atau 10% durasi kalau videonya pendek banget
+            const target = Math.min(1, (videoEl.duration || 1) * 0.1);
+            videoEl.currentTime = target;
+        });
+
+        videoEl.addEventListener('seeked', () => {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = videoEl.videoWidth || 640;
+                canvas.height = videoEl.videoHeight || 360;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob((blob) => {
+                    bersihkan();
+                    if (blob) resolve(blob); else reject(new Error('Gagal bikin thumbnail'));
+                }, 'image/jpeg', 0.8);
+            } catch (err) {
+                bersihkan();
+                reject(err);
+            }
+        });
+
+        videoEl.addEventListener('error', () => {
+            bersihkan();
+            reject(new Error('Gagal memuat video buat thumbnail'));
+        });
+    });
 }
 
 function buatPhotoCard(item) {
@@ -1056,9 +1098,11 @@ function buatVideoCard(item) {
         div.dataset.judul = item.judul;
         div.dataset.durasi = item.durasi || '';
         div.dataset.url = item.video_url;
+        div.dataset.thumbnailUrl = item.thumbnail_url || '';
     }
 
     div.innerHTML = `
+        ${item.thumbnail_url ? `<img class="video-thumb" src="${item.thumbnail_url}" alt="${escapeHtml(item.judul)}" loading="lazy">` : ''}
         <span class="play-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         </span>
@@ -1208,6 +1252,7 @@ if (formVideo) {
         videoFormMsg.textContent = modeEdit ? 'Menyimpan perubahan...' : 'Mengunggah video...';
 
         let publicUrl = modeEdit ? editingVideoUrl : null;
+        let thumbnailUrl = modeEdit ? (editingVideoCard?.dataset.thumbnailUrl || null) : null;
 
         if (file) {
             const ext = file.name.split('.').pop();
@@ -1225,12 +1270,32 @@ if (formVideo) {
 
             const { data: urlData } = supabaseClient.storage.from('galeri').getPublicUrl(namaFile);
             publicUrl = urlData.publicUrl;
+
+            // bikin thumbnail otomatis dari frame video, upload juga ke storage
+            videoFormMsg.textContent = 'Membuat thumbnail...';
+            try {
+                const thumbBlob = await buatThumbnailDariVideo(file);
+                const namaThumb = `thumb-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+                const { error: thumbUploadError } = await supabaseClient.storage
+                    .from('galeri')
+                    .upload(namaThumb, thumbBlob, { contentType: 'image/jpeg' });
+
+                if (!thumbUploadError) {
+                    const { data: thumbUrlData } = supabaseClient.storage.from('galeri').getPublicUrl(namaThumb);
+                    thumbnailUrl = thumbUrlData.publicUrl;
+                }
+                // kalau gagal bikin/upload thumbnail, gak apa-apa, video tetap kesimpen tanpa thumbnail
+            } catch (thumbErr) {
+                console.warn('Gagal bikin thumbnail otomatis:', thumbErr);
+            }
+
+            videoFormMsg.textContent = modeEdit ? 'Menyimpan perubahan...' : 'Mengunggah video...';
         }
 
         if (modeEdit) {
             const { error: updateError } = await supabaseClient
                 .from('videos')
-                .update({ judul, durasi, video_url: publicUrl })
+                .update({ judul, durasi, video_url: publicUrl, thumbnail_url: thumbnailUrl })
                 .eq('id', editingVideoId);
 
             if (updateError) {
@@ -1246,16 +1311,28 @@ if (formVideo) {
                 editingVideoCard.dataset.judul = judul;
                 editingVideoCard.dataset.durasi = durasi;
                 editingVideoCard.dataset.url = publicUrl;
+                editingVideoCard.dataset.thumbnailUrl = thumbnailUrl || '';
                 const titleEl = editingVideoCard.querySelector('.video-title');
                 if (titleEl) titleEl.textContent = judul;
                 const durasiEl = editingVideoCard.querySelector('.video-duration');
                 if (durasiEl) durasiEl.textContent = durasi;
+                if (thumbnailUrl) {
+                    let imgEl = editingVideoCard.querySelector('.video-thumb');
+                    if (!imgEl) {
+                        imgEl = document.createElement('img');
+                        imgEl.className = 'video-thumb';
+                        imgEl.loading = 'lazy';
+                        editingVideoCard.prepend(imgEl);
+                    }
+                    imgEl.src = thumbnailUrl;
+                    imgEl.alt = judul;
+                }
             }
 
             if (modalVideoForm) modalVideoForm.style.display = 'none';
             alert('Perubahan video berhasil disimpan!');
         } else {
-            const itemBaru = { judul, durasi, video_url: publicUrl };
+            const itemBaru = { judul, durasi, video_url: publicUrl, thumbnail_url: thumbnailUrl };
 
             const { data: inserted, error: insertError } = await supabaseClient
                 .from('videos')
