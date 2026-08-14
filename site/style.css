@@ -536,6 +536,11 @@ body.is-admin .photo-admin-actions { display: flex; }
 }
 #gallery, #video { max-width: 960px; }
 
+/* biar pas klik link navbar (#gallery, #timeline, #video), section-nya gak ketutup navbar sticky/fixed */
+#gallery, #timeline, #video {
+  scroll-margin-top: 90px;
+}
+
 .section-heading {
   text-align: center;
   margin-bottom: 40px;
