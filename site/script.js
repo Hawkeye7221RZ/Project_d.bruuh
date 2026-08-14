@@ -484,10 +484,16 @@ async function muatPesan() {
 
     if (error) {
         console.error('Gagal memuat pesan:', error.message);
+        containerPesan.innerHTML = '<p class="empty-state">Gagal memuat pesan. Coba refresh halaman.</p>';
         return;
     }
 
     containerPesan.innerHTML = ''; // Hapus pesan tiruan (Alya, Bima, dll)
+
+    if (!data || data.length === 0) {
+        containerPesan.innerHTML = '<p class="empty-state">Belum ada pesan. Jadi yang pertama nulis!</p>';
+        return;
+    }
 
     data.forEach(item => {
         const card = document.createElement('div');
@@ -916,6 +922,11 @@ if (formFoto) {
             fotoMsg.textContent = 'Pilih file foto dulu.';
             return;
         }
+        if (file && file.size > 5 * 1024 * 1024) {
+            fotoMsg.style.color = '#c0392b';
+            fotoMsg.textContent = 'Ukuran foto maksimal 5MB. File kamu: ' + (file.size / 1024 / 1024).toFixed(1) + 'MB.';
+            return;
+        }
         if (!caption) {
             fotoMsg.textContent = 'Keterangan foto tidak boleh kosong.';
             return;
@@ -1133,10 +1144,15 @@ async function muatVideo() {
 
     if (error) {
         console.error('Gagal memuat video:', error.message);
+        videoGrid.innerHTML = '<p class="empty-state">Gagal memuat video. Coba refresh halaman.</p>';
         return;
     }
 
     videoGrid.innerHTML = '';
+    if (!data || data.length === 0) {
+        videoGrid.innerHTML = '<p class="empty-state">Belum ada video.</p>';
+        return;
+    }
     data.forEach((item) => videoGrid.appendChild(buatVideoCard(item)));
 }
 
@@ -1241,6 +1257,11 @@ if (formVideo) {
 
         if (!modeEdit && !file) {
             videoFormMsg.textContent = 'Pilih file video dulu.';
+            return;
+        }
+        if (file && file.size > 50 * 1024 * 1024) {
+            videoFormMsg.style.color = '#c0392b';
+            videoFormMsg.textContent = 'Ukuran video maksimal 50MB. File kamu: ' + (file.size / 1024 / 1024).toFixed(1) + 'MB.';
             return;
         }
         if (!judul) {
@@ -1414,10 +1435,15 @@ async function muatMember() {
 
     if (error) {
         console.error('Gagal memuat member:', error.message);
+        memberGrid.innerHTML = '<p class="empty-state">Gagal memuat member. Coba refresh halaman.</p>';
         return;
     }
 
     memberGrid.innerHTML = '';
+    if (!data || data.length === 0) {
+        memberGrid.innerHTML = '<p class="empty-state">Belum ada member yang ditambahkan.</p>';
+        return;
+    }
     data.forEach((item) => memberGrid.appendChild(buatMemberCard(item)));
 }
 
@@ -1524,6 +1550,11 @@ if (formMember) {
 
         if (!modeEdit && !file) {
             memberMsg.textContent = 'Pilih foto profil dulu.';
+            return;
+        }
+        if (file && file.size > 5 * 1024 * 1024) {
+            memberMsg.style.color = '#c0392b';
+            memberMsg.textContent = 'Ukuran foto maksimal 5MB. File kamu: ' + (file.size / 1024 / 1024).toFixed(1) + 'MB.';
             return;
         }
         if (!nama) {

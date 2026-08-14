@@ -2,15 +2,15 @@
    DESIGN TOKENS — Palette: Forest Coffee
    ========================================================== */
 :root {
-  --bg: #F4F1EA;            /* Cream — background utama */
-  --bg-elevated: #FFFFFF;   /* Card/elemen yang naik dari background */
-  --bg-soft: #EAE3D3;       /* Variasi cream yang sedikit lebih gelap */
-  --border: #E0D6C2;        /* Border lembut, turunan cream/coffee */
+  --bg: #F4F1EA;           
+  --bg-elevated: #FFFFFF;  
+  --bg-soft: #EAE3D3;       
+  --border: #E0D6C2;        
 
-  --forest: #2D5A4A;        /* Primary — navigasi, tombol utama */
-  --coffee: #6F4E37;        /* Sekunder — kartu, elemen aksen */
-  --sunset: #E07A5F;        /* Aksen penting — highlight, hover */
-  --charcoal: #2B2B2B;      /* Teks utama */
+  --forest: #2D5A4A;        
+  --coffee: #6F4E37;        
+  --sunset: #E07A5F;        
+  --charcoal: #2B2B2B;      
 
   --text: var(--charcoal);
   --text-muted: rgba(43, 43, 43, 0.62);
@@ -34,7 +34,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
-  overflow-x: clip; /* cegah scroll horizontal tanpa merusak position:sticky */
+  overflow-x: clip;
 }
 
 a { text-decoration: none; color: inherit; }
@@ -211,7 +211,6 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   gap: 10px;
 }
 
-/* Status akun yang muncul di dalam panel menu HP, biar jelas walau tombol navbar diringkas */
 .nav-account-status {
   font-size: 13px;
   color: var(--text-muted);
@@ -228,7 +227,6 @@ button { font-family: inherit; border: none; cursor: pointer; background: none; 
   outline: none;
 }
 
-/* Hamburger — cuma muncul di layar mobile */
 .menu-toggle {
   display: none;
   color: rgba(244, 241, 234, 0.9);
@@ -499,6 +497,33 @@ body.is-admin .photo-admin-actions { display: flex; }
   color: var(--text-faint);
   font-size: 14px;
   padding: 40px 0;
+}
+
+.loading-text {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 14px;
+  padding: 40px 0;
+  position: relative;
+  padding-left: 0;
+}
+
+.loading-text::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border: 2px solid var(--border);
+  border-top-color: var(--sunset);
+  border-radius: 50%;
+  vertical-align: -2px;
+  animation: loading-spin 0.7s linear infinite;
+}
+
+@keyframes loading-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ==========================================================

@@ -1,8 +1,3 @@
--- ============================================================
--- MIGRATION: Full Admin CRUD (Member, Video, Pesan)
--- Jalankan SEMUA blok ini sekaligus di Supabase SQL Editor
--- (bikin tab SQL Editor baru, paste semua, klik Run)
--- ============================================================
 
 -- ============================================================
 -- 1. TABEL MEMBERS (Profil Teman)
@@ -42,7 +37,6 @@ on public.members for delete
 to authenticated
 using (exists (select 1 from public.admins a where a.user_id = auth.uid()));
 
--- pindahin data member yang sudah ada biar gak hilang (avatar tetap pakai file lokal assets/)
 insert into public.members (nama, username, quote, avatar_url)
 select * from (values
   ('Abi', '@caesarabigail', 'Every step matters.', 'assets/abi.jpeg'),
@@ -101,7 +95,6 @@ on public.videos for delete
 to authenticated
 using (exists (select 1 from public.admins a where a.user_id = auth.uid()));
 
--- pindahin video yang sudah ada biar gak hilang (tetap pakai file lokal assets/videos/)
 insert into public.videos (judul, durasi, video_url)
 select * from (values
   ('Bikin kopi', '0:21', 'assets/videos/bikinkopi.mp4'),
