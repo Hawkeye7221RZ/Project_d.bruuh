@@ -64,7 +64,7 @@ Hangat, alami, dan nyaman. Cocok buat tema adventure, ngopi, dan kebersamaan.
 
 ```
 Project_d.bruuh/
-├── site/                  # Semua file yang di-deploy ke publik
+├── site/                 
 │   ├── index.html
 │   ├── profil-teman.html
 │   ├── pesan-kesan.html
@@ -74,7 +74,7 @@ Project_d.bruuh/
 │   └── assets/
 │       ├── logo.png
 │       └── videos/
-├── sql/                    # Migration & RLS policy Supabase (gak ikut deploy)
+├── sql/                   
 │   ├── setup-galeri-foto.sql
 │   ├── migration_admin_full.sql
 │   ├── setup-supabase.sql
